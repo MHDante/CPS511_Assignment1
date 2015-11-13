@@ -12,6 +12,7 @@
 #include <math.h>
 #include <utility>
 #include <vector>
+#include <list>
 #include "VECTOR3D.h"
 #include "CubeMesh.h"
 #include "QuadMesh.h"
@@ -23,7 +24,7 @@ void mouse(int button, int state, int x, int y);
 void mouseMotionHandler(int xMouse, int yMouse);
 void keyboard(unsigned char key, int x, int y);
 void functionKeys(int key, int x, int y);
-VECTOR3D ScreenToWorld(int x, int y);
+Vector3 ScreenToWorld(int x, int y);
 
 static int currentButton;
 static unsigned char currentKey;
@@ -36,10 +37,14 @@ GLfloat light_ambient[]   = {0.2, 0.2, 0.2, 1.0};
 
 
 // Cube Mesh Array variables and initialization
-std::vector<CubeMesh*> cubes;
 // ...
 // also add a variable to keep track of current cube mesh
 // Interaction State Variable
+std::list<CubeMesh*> cubes;
+std::vector<CubeMesh*> selectedCubes;
+std::list<CubeMesh*>::iterator selector;
+
+
 enum Action {TRANSLATE, ROTATE, SCALE, EXTRUDE, RAISE, SELECT, MULTIPLESELECT, DESELECT_ALL};
 enum Action currentAction = TRANSLATE;
 
@@ -113,15 +118,15 @@ void initOpenGL(int w, int h)
   glHint(GL_PERSPECTIVE_CORRECTION_HINT , GL_NICEST);
   
   // Set up meshes
-  VECTOR3D origin  = VECTOR3D(-8.0f,0.0f,8.0f);
-  VECTOR3D dir1v   = VECTOR3D(1.0f, 0.0f, 0.0f);
-  VECTOR3D dir2v   = VECTOR3D(0.0f, 0.0f,-1.0f);
+  Vector3 origin  = Vector3(-8.0f,0.0f,8.0f);
+  Vector3 dir1v   = Vector3(1.0f, 0.0f, 0.0f);
+  Vector3 dir2v   = Vector3(0.0f, 0.0f,-1.0f);
   floorMesh = new QuadMesh(meshSize, 16.0);
   floorMesh->InitMesh(meshSize, origin, 16.0, 16.0, dir1v, dir2v);
   
-  VECTOR3D ambient = VECTOR3D(0.0f,0.0f,0.0f);
-  VECTOR3D specular= VECTOR3D(0.0f,0.0f,0.0f);
-  VECTOR3D diffuse= VECTOR3D(0.9f, 0.5f, 0.0f);
+  Vector3 ambient = Vector3(0.0f,0.0f,0.0f);
+  Vector3 specular= Vector3(0.0f,0.0f,0.0f);
+  Vector3 diffuse= Vector3(0.9f, 0.5f, 0.0f);
   float shininess = 0.0;
   floorMesh->SetMaterial(ambient,diffuse,specular,shininess);
   
@@ -130,25 +135,25 @@ void initOpenGL(int w, int h)
   // Make sure direction vectors are such that the normals are pointing into the room
   // Use the right-hand-rule (cross product) 
   // If you are confused about this, ask in class
-  diffuse = VECTOR3D(0, 1, 0.0f);
+  diffuse = Vector3(0, 1, 0.0f);
 
-  origin = VECTOR3D(-8.0f, 0.0f, 8.0f);
-  dir1v = VECTOR3D(0.0f, 0.0f, -1.0f);
-  dir2v = VECTOR3D(0.0f, .25f, 0.0f);
+  origin = Vector3(-8.0f, 0.0f, 8.0f);
+  dir1v = Vector3(0.0f, 0.0f, -1.0f);
+  dir2v = Vector3(0.0f, .25f, 0.0f);
   wallMeshes[0] = new QuadMesh(meshSize, 16.0);
   wallMeshes[0]->InitMesh(meshSize, origin, 16.0, 16.0, dir1v, dir2v);
   wallMeshes[0]->SetMaterial(ambient, diffuse, specular, shininess);
 
-  origin = VECTOR3D(8.0f, 0.0f, -8.0f);
-  dir1v = VECTOR3D(0.0f, 0.0f, 1.0f);
-  dir2v = VECTOR3D(0.0f, .25f, 0.0f);
+  origin = Vector3(8.0f, 0.0f, -8.0f);
+  dir1v = Vector3(0.0f, 0.0f, 1.0f);
+  dir2v = Vector3(0.0f, .25f, 0.0f);
   wallMeshes[1] = new QuadMesh(meshSize, 16.0);
   wallMeshes[1]->InitMesh(meshSize, origin, 16.0, 16.0, dir1v, dir2v);
   wallMeshes[1]->SetMaterial(ambient, diffuse, specular, shininess);
 
-  origin = VECTOR3D(-8.0f, 0.0f, -8.0f);
-  dir1v = VECTOR3D(1.0f, 0.0f, 0.0f);
-  dir2v = VECTOR3D(0.0f, .25f, 0.0f);
+  origin = Vector3(-8.0f, 0.0f, -8.0f);
+  dir1v = Vector3(1.0f, 0.0f, 0.0f);
+  dir2v = Vector3(0.0f, .25f, 0.0f);
   wallMeshes[2] = new QuadMesh(meshSize, 16.0);
   wallMeshes[2]->InitMesh(meshSize, origin, 16.0, 16.0, dir1v, dir2v);
   wallMeshes[2]->SetMaterial(ambient, diffuse, specular, shininess);
@@ -175,16 +180,16 @@ void display(void)
   gluLookAt(0.0,6.0,22.0,0.0,0.0,0.0,0.0,1.0,0.0);
   
   // Draw all cubes (see CubeMesh.h)
-  //...
+  for (auto c : cubes) {
+    c->drawCube();
+  }
   
   // Draw floor and wall meshes
   floorMesh->DrawMesh(meshSize);
   for (auto w : wallMeshes){
     w->DrawMesh(meshSize);
   }
-  for (auto c : cubes) {
-    c->drawCube();
-  }
+  
 
   glutSwapBuffers();
 }
@@ -202,7 +207,7 @@ void reshape(int w, int h)
 
 }
 
-VECTOR3D pos = VECTOR3D(0,0,0);
+Vector3 pos = Vector3(0,0,0);
 
 // Mouse button callback - use only if you want to 
 void mouse(int button, int state, int x, int y)
@@ -241,10 +246,10 @@ void mouseMotionHandler(int xMouse, int yMouse)
 }
 
 
-VECTOR3D ScreenToWorld(int x, int y)
+Vector3 ScreenToWorld(int x, int y)
 {
 	// you will need this if you use the mouse
-	return VECTOR3D(0);
+	return Vector3(0);
 }// ScreenToWorld()
 
 /* Handles input from the keyboard, non-arrow keys */
@@ -253,7 +258,7 @@ void keyboard(unsigned char key, int x, int y)
   switch (key) 
   {
   case 't':
-      currentAction = TRANSLATE;
+    currentAction = TRANSLATE;
 	  break;
   case 's':
 	  currentAction = SCALE;
@@ -284,23 +289,90 @@ void keyboard(unsigned char key, int x, int y)
   glutPostRedisplay();
 }
 
+void translate(Vector3 diff) {
+  bool clear = true;
+  for (auto c : selectedCubes) {
+    c->center += diff;
+    clear &= c->isWithin(roomBox);
+  }
+  if(!clear) 
+    for (auto c : selectedCubes) {
+      c->center -= diff;
+    }
+}
+
+void scale(Vector3 diff) {
+  float x = diff.x == 1 ? 1.25f : diff.x == -1 ? 0.8f : 1;
+  float z = diff.z == 1 ? 1.25f : diff.z == -1 ? 0.8f : 1;
+
+  bool clear = true;
+  for (auto c : selectedCubes) {
+    c->dim.SetX(c->dim.x * x);
+    c->dim.SetZ(c->dim.z * z);
+    clear &= c->isWithin(roomBox) && c->dim.x > 0.1 && c->dim.z > 0.1;
+  }
+  if (!clear) {
+    float x2 = diff.x == 1 ? 0.8f : diff.x == -1 ? 1.25f : 1;
+    float z2 = diff.z == 1 ? 0.8f : diff.z == -1 ? 1.25f : 1;
+    for (auto c : selectedCubes) {
+      c->dim.SetX(c->dim.x * x2);
+      c->dim.SetZ(c->dim.z * z2);
+    }
+  }
+}
+
 void functionKeys(int key, int x, int y)
 {
-  VECTOR3D min, max;
+  auto diff = Vector3();
   switch (key) {
-  case GLUT_KEY_F1:
-    cubes.push_back(new CubeMesh());
-    break;
-  case GLUT_KEY_DOWN:
-    break;  
-  case GLUT_KEY_UP:
-      break;  
-  case GLUT_KEY_RIGHT:
-        break;
-  case GLUT_KEY_LEFT:
+  case GLUT_KEY_F1: {
+    auto c = new CubeMesh();
+    c->center.SetY(2);
+    if (selectedCubes.size() == 1) { 
+      selectedCubes.at(0)->selected = false; 
+      selectedCubes.clear();
+    }
+    cubes.push_back(c);
+    selectedCubes.push_back(c);
+    selector = cubes.end();
     break;
   }
+  case GLUT_KEY_DOWN:
+    diff.SetZ(1);
+    break;
+  case GLUT_KEY_UP:
+    diff.SetZ(-1);
+    break;
+  case GLUT_KEY_RIGHT:
+    diff.SetX(1);
+    break;
+  case GLUT_KEY_LEFT:
+    diff.SetX(-1);
+    break;
+  }
+  if (diff.GetLength() > 0) {
+    switch (currentAction) {
+    case TRANSLATE: translate(diff); break;
+    case SCALE: scale(diff);  break;
+    case ROTATE:
+      break;
+    case EXTRUDE:
+      break;
+    case RAISE:
+      break;
+    case SELECT:
+      break;
+    case MULTIPLESELECT:
+      break;
+    case DESELECT_ALL:
+      break;
+    }
+  }
+  
   glutPostRedisplay();
 }
+
+
+
 
 

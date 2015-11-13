@@ -1,7 +1,7 @@
 typedef struct BoundingBox
 {
-  VECTOR3D min;
-  VECTOR3D max;
+  Vector3 min;
+  Vector3 max;
 } BBox;
 
 
@@ -36,10 +36,8 @@ typedef class CubeMesh
     { 0.0, 0.0,  1.0 },	// Front Face
     { 0.0,-1.0,  0.0 } };	// Bottom Face
 public:
-	VECTOR3D center;
-	VECTOR3D dim;
-	float tx, ty, tz;			// Translatation Deltas
-	float sfx, sfy, sfz;		// Scale Factors
+	Vector3 center;
+	Vector3 dim;
 	float angle;				// Angle around y-axis of cube coordinate system
 	bool selected;
 
@@ -56,6 +54,7 @@ public:
 	float highlightMat_shininess[1];
 public:
   CubeMesh();
+  bool isWithin(BBox* container);
   BBox* getBBox();
   void drawCube();
 

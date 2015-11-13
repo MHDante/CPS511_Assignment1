@@ -16,23 +16,23 @@
 #ifndef VECTOR3D_H
 #define VECTOR3D_H
 
-class VECTOR3D
+class Vector3
 {
 public:
 	//constructors
-	VECTOR3D(void)	:	x(0.0f), y(0.0f), z(0.0f)
+	Vector3(void)	:	x(0.0f), y(0.0f), z(0.0f)
 	{}
 
-	VECTOR3D(float newX, float newY, float newZ)	:	x(newX), y(newY), z(newZ)
+	Vector3(float newX, float newY, float newZ)	:	x(newX), y(newY), z(newZ)
 	{}
 
-	VECTOR3D(const float * rhs)	:	x(*rhs), y(*(rhs+1)), z(*(rhs+2))
+	Vector3(const float * rhs)	:	x(*rhs), y(*(rhs+1)), z(*(rhs+2))
 	{}
 
-	VECTOR3D(const VECTOR3D & rhs)	:	x(rhs.x), y(rhs.y), z(rhs.z)
+	Vector3(const Vector3 & rhs)	:	x(rhs.x), y(rhs.y), z(rhs.z)
 	{}
 
-	~VECTOR3D() {}	//empty
+	~Vector3() {}	//empty
 
 	void Set(float newX, float newY, float newZ)
 	{	x=newX;	y=newY;	z=newZ;	}
@@ -52,10 +52,10 @@ public:
 	{	x=y=z=1.0f;	}
 	
 	//vector algebra
-	VECTOR3D CrossProduct(const VECTOR3D & rhs) const
-	{	return VECTOR3D(y*rhs.z - z*rhs.y, z*rhs.x - x*rhs.z, x*rhs.y - y*rhs.x);	}
+	Vector3 CrossProduct(const Vector3 & rhs) const
+	{	return Vector3(y*rhs.z - z*rhs.y, z*rhs.x - x*rhs.z, x*rhs.y - y*rhs.x);	}
 
-	float DotProduct(const VECTOR3D & rhs) const
+	float DotProduct(const Vector3 & rhs) const
 	{	return x*rhs.x + y*rhs.y + z*rhs.z;	}
 	
 	void Normalize()
@@ -76,67 +76,67 @@ public:
 
 	//rotations
 	void RotateX(double angle);
-	VECTOR3D GetRotatedX(double angle) const;
+	Vector3 GetRotatedX(double angle) const;
 	void RotateY(double angle);
-	VECTOR3D GetRotatedY(double angle) const;
+	Vector3 GetRotatedY(double angle) const;
 	void RotateZ(double angle);
-	VECTOR3D GetRotatedZ(double angle) const;
-	void RotateAxis(double angle, const VECTOR3D & axis);
-	VECTOR3D GetRotatedAxis(double angle, const VECTOR3D & axis) const;
+	Vector3 GetRotatedZ(double angle) const;
+	void RotateAxis(double angle, const Vector3 & axis);
+	Vector3 GetRotatedAxis(double angle, const Vector3 & axis) const;
 
 	//pack to [0,1] for color
 	void PackTo01();
-	VECTOR3D GetPackedTo01() const;
+	Vector3 GetPackedTo01() const;
 
 	//linear interpolate
-	VECTOR3D lerp(const VECTOR3D & v2, float factor) const
+	Vector3 lerp(const Vector3 & v2, float factor) const
 	{	return (*this)*(1.0f-factor) + v2*factor;	}
 
-	VECTOR3D QuadraticInterpolate(const VECTOR3D & v2, const VECTOR3D & v3, float factor) const
+	Vector3 QuadraticInterpolate(const Vector3 & v2, const Vector3 & v3, float factor) const
 	{	return (*this)*(1.0f-factor)*(1.0f-factor) + 2*v2*factor*(1.0f-factor) + v3*factor*factor;}
 
 
 	//overloaded operators
 	//binary operators
-	VECTOR3D operator+(const VECTOR3D & rhs) const
-	{	return VECTOR3D(x + rhs.x, y + rhs.y, z + rhs.z);	}
+	Vector3 operator+(const Vector3 & rhs) const
+	{	return Vector3(x + rhs.x, y + rhs.y, z + rhs.z);	}
 	
-	VECTOR3D operator-(const VECTOR3D & rhs) const
-	{	return VECTOR3D(x - rhs.x, y - rhs.y, z - rhs.z);	}
+	Vector3 operator-(const Vector3 & rhs) const
+	{	return Vector3(x - rhs.x, y - rhs.y, z - rhs.z);	}
 
-	VECTOR3D operator*(const float rhs) const
-	{	return VECTOR3D(x*rhs, y*rhs, z*rhs);	}
+	Vector3 operator*(const float rhs) const
+	{	return Vector3(x*rhs, y*rhs, z*rhs);	}
 	
-	VECTOR3D operator/(const float rhs) const
-	{	return (rhs==0.0f) ? VECTOR3D(0.0f, 0.0f, 0.0f) : VECTOR3D(x / rhs, y / rhs, z / rhs);	}
+	Vector3 operator/(const float rhs) const
+	{	return (rhs==0.0f) ? Vector3(0.0f, 0.0f, 0.0f) : Vector3(x / rhs, y / rhs, z / rhs);	}
 
 	//multiply by a float, eg 3*v
-	friend VECTOR3D operator*(float scaleFactor, const VECTOR3D & rhs);
+	friend Vector3 operator*(float scaleFactor, const Vector3 & rhs);
 
 	//Add, subtract etc, saving the construction of a temporary
-	void Add(const VECTOR3D & v2, VECTOR3D & result)
+	void Add(const Vector3 & v2, Vector3 & result)
 	{
 		result.x=x+v2.x;
 		result.y=y+v2.y;
 		result.z=z+v2.z;
 	}
 
-	void Subtract(const VECTOR3D & v2, VECTOR3D & result)
+	void Subtract(const Vector3 & v2, Vector3 & result)
 	{
 		result.x=x-v2.x;
 		result.y=y-v2.y;
 		result.z=z-v2.z;
 	}
 
-	bool operator==(const VECTOR3D & rhs) const;
-	bool operator!=(const VECTOR3D & rhs) const
+	bool operator==(const Vector3 & rhs) const;
+	bool operator!=(const Vector3 & rhs) const
 	{	return !((*this)==rhs);	}
 
 	//self-add etc
-	void operator+=(const VECTOR3D & rhs)
+	void operator+=(const Vector3 & rhs)
 	{	x+=rhs.x;	y+=rhs.y;	z+=rhs.z;	}
 
-	void operator-=(const VECTOR3D & rhs)
+	void operator-=(const Vector3 & rhs)
 	{	x-=rhs.x;	y-=rhs.y;	z-=rhs.z;	}
 
 	void operator*=(const float rhs)
@@ -151,8 +151,8 @@ public:
 
 
 	//unary operators
-	VECTOR3D operator-(void) const {return VECTOR3D(-x, -y, -z);}
-	VECTOR3D operator+(void) const {return *this;}
+	Vector3 operator-(void) const {return Vector3(-x, -y, -z);}
+	Vector3 operator+(void) const {return *this;}
 
 	//cast to pointer to a (float *) for glVertex3fv etc
 	operator float* () const {return (float*) this;}

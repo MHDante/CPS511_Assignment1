@@ -13,10 +13,6 @@
 CubeMesh::CubeMesh()
 {
   angle = 0.0;
-  sfx = sfy = sfz = 1.0;
-  tx = 0.0;
-  ty = 0.0;
-  tz = 0.0;
   center.Set(0, 0, 0);
   dim.Set(2.0f, 2.0f, 2.0f);
 
@@ -54,7 +50,18 @@ CubeMesh::CubeMesh()
 // Use this function for collision detection of cube and walls/floor
 BBox* CubeMesh::getBBox()
 {
-  return 0;
+  auto b = new BBox();
+  b->min = (center - (dim));
+  b->max = (center + (dim) );
+  return b;
+}
+
+bool CubeMesh::isWithin(BBox* a) {
+  auto b = getBBox();
+  bool res = ((a->min.x <= b->min.x) && (a->min.y <= b->min.y) && (a->min.z <= b->min.z) &&
+    (a->max.x >= b->max.x) && (a->max.y >= b->max.y) && (a->max.z >= b->max.z));
+  delete b;
+  return res;
 }
 
 void CubeMesh::drawCube()
@@ -79,8 +86,10 @@ void CubeMesh::drawCube()
 
   // Transform and Draw cube   
   glPushMatrix();
-  // put your transform code here
-  // ......
+
+  glTranslatef(center.x, center.y, center.z);
+  glScalef(dim.x, dim.y, dim.z);
+  glRotatef(angle, 0, 1, 0);
 
   glBegin(GL_QUADS);
   // Back Face

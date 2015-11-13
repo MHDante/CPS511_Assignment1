@@ -41,7 +41,7 @@ QuadMesh::QuadMesh(int maxMeshSize, float meshDim)
     
 }
 
-void QuadMesh::SetMaterial(VECTOR3D ambient, VECTOR3D diffuse, VECTOR3D specular, double shininess)
+void QuadMesh::SetMaterial(Vector3 ambient, Vector3 diffuse, Vector3 specular, double shininess)
 {
 	mat_ambient[0] = ambient.x;
 	mat_ambient[1] = ambient.y;
@@ -77,13 +77,13 @@ bool QuadMesh::CreateMemory()
 		
 
 
-bool QuadMesh::InitMesh(int meshSize,VECTOR3D origin,double meshLength,double meshWidth,VECTOR3D dir1, VECTOR3D dir2)
+bool QuadMesh::InitMesh(int meshSize,Vector3 origin,double meshLength,double meshWidth,Vector3 dir1, Vector3 dir2)
 {
-	VECTOR3D o;
+	Vector3 o;
 	int currentVertex = 0; 	  
 	double sf1,sf2; 
     
-	VECTOR3D v1,v2;
+	Vector3 v1,v2;
 	
 	v1.x = dir1.x;
 	v1.y = dir1.y;
@@ -98,7 +98,7 @@ bool QuadMesh::InitMesh(int meshSize,VECTOR3D origin,double meshLength,double me
 	sf2 = meshWidth/meshSize;
 	v2 *= sf2;
     
-	VECTOR3D meshpt;
+	Vector3 meshpt;
 	
 	// VERTICES
 	numVertices=(meshSize+1)*(meshSize+1);
@@ -222,7 +222,7 @@ void QuadMesh::ComputeNormals()
 	{
 		for(int k=0; k< this->maxMeshSize; k++)
 		{
-			VECTOR3D n0,n1,n2,n3,e0,e1,e2,e3,ne0,ne1,ne2,ne3;
+			Vector3 n0,n1,n2,n3,e0,e1,e2,e3,ne0,ne1,ne2,ne3;
 			
 			quads[currentQuad].vertices[0]->normal.LoadZero();
 			quads[currentQuad].vertices[1]->normal.LoadZero();

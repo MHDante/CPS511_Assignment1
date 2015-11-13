@@ -1,7 +1,7 @@
 struct MeshVertex
 {
-	VECTOR3D	position;
-	VECTOR3D    normal;
+	Vector3	position;
+	Vector3    normal;
 };
 
 
@@ -54,10 +54,10 @@ public:
 		return MaxMeshDim(minMeshSize, maxMeshSize);
 	}
 	
-	bool InitMesh(int meshSize, VECTOR3D origin, double meshLength, double meshWidth,VECTOR3D dir1, VECTOR3D dir2);
+	bool InitMesh(int meshSize, Vector3 origin, double meshLength, double meshWidth,Vector3 dir1, Vector3 dir2);
 	void DrawMesh(int meshSize);
 	void UpdateMesh();
-	void QuadMesh::SetMaterial(VECTOR3D ambient, VECTOR3D diffuse, VECTOR3D specular, double shininess);
+	void QuadMesh::SetMaterial(Vector3 ambient, Vector3 diffuse, Vector3 specular, double shininess);
 	void ComputeNormals();
 	
 	
