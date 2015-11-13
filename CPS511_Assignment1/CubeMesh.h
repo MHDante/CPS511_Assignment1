@@ -38,7 +38,7 @@ typedef class CubeMesh
 public:
 	Vector3 center;
 	Vector3 dim;
-	float angle;				// Angle around y-axis of cube coordinate system
+	int angle;				// Angle around y-axis of cube coordinate system
 	bool selected;
 
 	// Material properties for drawing

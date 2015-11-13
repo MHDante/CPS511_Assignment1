@@ -12,7 +12,7 @@
 
 CubeMesh::CubeMesh()
 {
-  angle = 0.0;
+  angle = 0;
   center.Set(0, 0, 0);
   dim.Set(2.0f, 2.0f, 2.0f);
 
@@ -45,18 +45,43 @@ CubeMesh::CubeMesh()
   highlightMat_shininess[0] = 0.0;
 }
 
+Vector3 rotatePoint(Vector3 v, float angle) {
+  return Vector3(
+    (v.x / 2) * cos(angle) - (v.z / 2) * sin(angle),
+    v.y,
+    (v.z / 2) * cos(angle) + (v.x / 2) * sin(angle));
+}
+
 // Given a cube mesh, compute it's current bounding box and return in vectors min and max
 // i.e. compute min.x,min.y,mi.z,max.x,max.y,max.z
 // Use this function for collision detection of cube and walls/floor
 BBox* CubeMesh::getBBox()
 {
+  Vector3 edgePoints[4] = {
+    rotatePoint(Vector3(-dim.x, 0,-dim.z), angle),
+    rotatePoint(Vector3(-dim.x, 0,dim.z), angle),
+    rotatePoint(Vector3(dim.x, 0,-dim.z), angle),
+    rotatePoint(Vector3(dim.x, 0,dim.z), angle) };
+
+  float maxX = FLT_MIN;
+  float maxZ = FLT_MIN;
+
+  for (auto pt : edgePoints) {
+    if (pt.x > maxX) maxX = pt.x;
+    if (pt.z > maxZ) maxZ = pt.z;
+  }
+  auto bounds = Vector3(maxX, dim.y, maxZ);
   auto b = new BBox();
-  b->min = (center - (dim));
-  b->max = (center + (dim) );
+  b->min = (center - (bounds) );
+  b->max = (center + (bounds) );
   return b;
 }
 
+
+
 bool CubeMesh::isWithin(BBox* a) {
+
+
   auto b = getBBox();
   bool res = ((a->min.x <= b->min.x) && (a->min.y <= b->min.y) && (a->min.z <= b->min.z) &&
     (a->max.x >= b->max.x) && (a->max.y >= b->max.y) && (a->max.z >= b->max.z));
@@ -88,7 +113,7 @@ void CubeMesh::drawCube()
   glPushMatrix();
 
   glTranslatef(center.x, center.y, center.z);
-  glScalef(dim.x, dim.y, dim.z);
+  glScalef(dim.x/2, dim.y/2, dim.z/2);
   glRotatef(angle, 0, 1, 0);
 
   glBegin(GL_QUADS);

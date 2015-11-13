@@ -295,9 +295,31 @@ void translate(Vector3 diff) {
     c->center += diff;
     clear &= c->isWithin(roomBox);
   }
-  if(!clear) 
+  if (!clear)
     for (auto c : selectedCubes) {
       c->center -= diff;
+    }
+}
+void rotate(Vector3 diff) {
+  bool clear = true;
+  for (auto c : selectedCubes) {
+    c->angle = ((int)(c->angle + diff.x + diff.z)) % 360;
+    clear &= c->isWithin(roomBox);
+  }
+  if (!clear)
+    for (auto c : selectedCubes) {
+      c->angle = ((int)(c->angle - diff.x - diff.z)) % 360;
+    }
+}
+void extrude(Vector3 diff) {
+  bool clear = true;
+  for (auto c : selectedCubes) {
+    c->angle = ((int)(c->angle + diff.x + diff.z)) % 360;
+    clear &= c->isWithin(roomBox);
+  }
+  if (!clear)
+    for (auto c : selectedCubes) {
+      c->angle = ((int)(c->angle - diff.x - diff.z)) % 360;
     }
 }
 
@@ -353,10 +375,9 @@ void functionKeys(int key, int x, int y)
   if (diff.GetLength() > 0) {
     switch (currentAction) {
     case TRANSLATE: translate(diff); break;
-    case SCALE: scale(diff);  break;
-    case ROTATE:
-      break;
-    case EXTRUDE:
+    case SCALE: scale(diff); break;
+    case ROTATE: rotate(diff); break;
+    case EXTRUDE: extrude(diff);
       break;
     case RAISE:
       break;
