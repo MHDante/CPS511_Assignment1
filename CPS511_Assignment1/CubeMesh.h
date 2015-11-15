@@ -1,3 +1,13 @@
+#ifndef CUBEMESH
+#define CUBEMESH
+#include <windows.h>
+#include <gl/gl.h>
+#include <gl/glu.h>
+#include <math.h>
+#include <utility>
+#include <vector>
+#include "Vector3.h"
+
 typedef struct BoundingBox
 {
   Vector3 min;
@@ -8,7 +18,7 @@ typedef struct BoundingBox
 // Vertex positions of a standard size cube (width 2), centered at the origin
 // of its own Model Coordinate System
 
-typedef class CubeMesh
+class CubeMesh
 {
   const GLfloat vertices[8][3] = {
     { -1.0, -1.0,-1.0 },
@@ -40,7 +50,7 @@ public:
 	Vector3 dim;
 	int angle;				// Angle around y-axis of cube coordinate system
 	bool selected;
-
+  bool hovered;
 	// Material properties for drawing
 	float mat_ambient[4];
   float mat_specular[4];
@@ -54,11 +64,11 @@ public:
 	float highlightMat_shininess[1];
 public:
   CubeMesh();
-  bool isWithin(BBox* container);
-  BBox* getBBox();
-  void drawCube();
+  bool isWithin(BBox* container) const;
+  BBox* getBBox() const;
+  void drawCube() const;
 
+  static bool singleSelecting;
 
-} CubeMesh;
-
-	
+};
+#endif

@@ -1,17 +1,11 @@
-#include <windows.h>
-#include <gl/gl.h>
-#include <gl/glu.h>
-#include <gl/glut.h>
-#include <string.h>
-#include <math.h>
-#include <utility>
-#include <vector>
-#include "VECTOR3D.h"
-
 #include "CubeMesh.h"
+
+bool CubeMesh::singleSelecting = true;
 
 CubeMesh::CubeMesh()
 {
+  selected = false;
+  hovered = false;
   angle = 0;
   center.Set(0, 0, 0);
   dim.Set(2.0f, 2.0f, 2.0f);
@@ -55,7 +49,7 @@ Vector3 rotatePoint(Vector3 v, float angle) {
 // Given a cube mesh, compute it's current bounding box and return in vectors min and max
 // i.e. compute min.x,min.y,mi.z,max.x,max.y,max.z
 // Use this function for collision detection of cube and walls/floor
-BBox* CubeMesh::getBBox()
+BBox* CubeMesh::getBBox() const
 {
   Vector3 edgePoints[4] = {
     rotatePoint(Vector3(-dim.x, 0,-dim.z), angle),
@@ -70,7 +64,7 @@ BBox* CubeMesh::getBBox()
     if (pt.x > maxX) maxX = pt.x;
     if (pt.z > maxZ) maxZ = pt.z;
   }
-  auto bounds = Vector3(maxX, dim.y, maxZ);
+  auto bounds = Vector3(maxX, dim.y/2, maxZ);
   auto b = new BBox();
   b->min = (center - (bounds) );
   b->max = (center + (bounds) );
@@ -79,7 +73,8 @@ BBox* CubeMesh::getBBox()
 
 
 
-bool CubeMesh::isWithin(BBox* a) {
+bool CubeMesh::isWithin(BBox* a) const
+{
 
 
   auto b = getBBox();
@@ -89,8 +84,48 @@ bool CubeMesh::isWithin(BBox* a) {
   return res;
 }
 
-void CubeMesh::drawCube()
+void CubeMesh::drawCube() const
 {
+  // Transform and Draw cube   
+  glPushMatrix();
+  glPushAttrib(GL_LIGHTING_BIT);
+  glTranslatef(center.x, center.y, center.z);
+
+  if (hovered) {
+    if (singleSelecting)
+    {
+      // Setup the material and lights used for the cube
+      glMaterialfv(GL_FRONT, GL_AMBIENT, highlightMat_ambient);
+      glMaterialfv(GL_FRONT, GL_SPECULAR, highlightMat_specular);
+      glMaterialfv(GL_FRONT, GL_DIFFUSE, highlightMat_diffuse);
+      glMaterialfv(GL_FRONT, GL_SHININESS, highlightMat_shininess);
+    }
+    else
+    {
+      // Setup the material and lights used for the cube
+      glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
+      glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+      glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
+      glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
+    }
+
+    glPushMatrix();
+    glTranslatef(0, dim.y / 2 + 0.2, 0);
+    glRotatef(270, 1, 0, 0);
+    GLUquadricObj *quadObj = gluNewQuadric();
+    gluCylinder(quadObj, 0, .5, 1, 10, 10);
+    glTranslatef(0, 0, .5);
+    gluCylinder(quadObj, .25, .25, 1, 10, 10);
+
+    glPopMatrix();
+  }
+
+  glScalef(dim.x/2, dim.y/2, dim.z/2);
+  glRotatef(angle, 0, 1, 0);
+
+  
+  
+
   if (selected)
   {
     // Setup the material and lights used for the cube
@@ -108,13 +143,6 @@ void CubeMesh::drawCube()
     glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
   }
 
-
-  // Transform and Draw cube   
-  glPushMatrix();
-
-  glTranslatef(center.x, center.y, center.z);
-  glScalef(dim.x/2, dim.y/2, dim.z/2);
-  glRotatef(angle, 0, 1, 0);
 
   glBegin(GL_QUADS);
   // Back Face
@@ -155,4 +183,5 @@ void CubeMesh::drawCube()
   glVertex3f(vertices[quads[23]][0], vertices[quads[23]][1], vertices[quads[23]][2]);
   glEnd();
   glPopMatrix();
+  glPopAttrib();
 }

@@ -1,23 +1,12 @@
-#include <windows.h>
-#include <gl/gl.h>
-#include <gl/glu.h>
-#include <gl/glut.h>
-#include <string.h>
-#include <math.h>
-#include <utility>
-#include <vector>
-#include "VECTOR3D.h"
-
 #include "QuadMesh.h"
-
 
 QuadMesh::QuadMesh(int maxMeshSize, float meshDim)
 {
 	minMeshSize =1;
 	numVertices = 0;
-	vertices = NULL;
+	vertices = nullptr;
 	numQuads = 0;
-	quads = NULL;
+	quads = nullptr;
 	numFacesDrawn = 0;
 	
 	this->maxMeshSize = maxMeshSize < minMeshSize ? minMeshSize : maxMeshSize;
@@ -25,37 +14,11 @@ QuadMesh::QuadMesh(int maxMeshSize, float meshDim)
 	CreateMemory();
 
 	// Setup the material and lights used for the mesh
-	mat_ambient[0] = 0.0;
-	mat_ambient[1] = 0.0;
-	mat_ambient[2] = 0.0;
-	mat_ambient[3] = 1.0;
-	mat_specular[0] = 0.0;
-	mat_specular[1] = 0.0;
-	mat_specular[2] = 0.0;
-	mat_specular[3] = 1.0;
-	mat_diffuse[0] = 0.9;
-	mat_diffuse[1] = 0.5;
-	mat_diffuse[2] = 0.0;
-	mat_diffuse[3] = 1.0;
-	mat_shininess[0] = 0.0;
+  mat_ambient = Vector3();
+	mat_specular = Vector3();
+	mat_diffuse= Vector3(.9,.5,.0);
+	mat_shininess = 0.0;
     
-}
-
-void QuadMesh::SetMaterial(Vector3 ambient, Vector3 diffuse, Vector3 specular, double shininess)
-{
-	mat_ambient[0] = ambient.x;
-	mat_ambient[1] = ambient.y;
-	mat_ambient[2] = ambient.z;
-	mat_ambient[3] = 1.0;
-	mat_specular[0] = specular.x;
-	mat_specular[1] = specular.y;
-	mat_specular[2] = specular.z;
-	mat_specular[3] = 1.0;
-	mat_diffuse[0] = diffuse.x;
-	mat_diffuse[1] = diffuse.y;
-	mat_diffuse[2] = diffuse.z;
-	mat_diffuse[3] = 1.0;
-	mat_shininess[0] = shininess;
 }
 
 bool QuadMesh::CreateMemory()
@@ -144,14 +107,14 @@ bool QuadMesh::InitMesh(int meshSize,Vector3 origin,double meshLength,double mes
 	return true;
 }
 
-void QuadMesh::DrawMesh(int meshSize)
+void QuadMesh::DrawMesh(int meshSize) const
 {
 	int currentQuad=0;
 
-	glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
-	glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
-	glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
-	glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
+	glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient.toGLFloat4(1.0));
+	glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular.toGLFloat4(1.0));
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse.toGLFloat4(1.0));
+	glMaterialfv(GL_FRONT, GL_SHININESS, &mat_shininess);
 
 	for(int j=0; j< meshSize; j++)
 	{
@@ -205,16 +168,16 @@ void QuadMesh::FreeMemory()
 {
 	if(vertices)
 		delete [] vertices;
-	vertices=NULL;
+	vertices= nullptr;
 	numVertices=0;
 
 	if(quads)
 		delete [] quads;
-	quads=NULL;
+	quads= nullptr;
 	numQuads=0;
 }
 
-void QuadMesh::ComputeNormals() 
+void QuadMesh::ComputeNormals() const
 {
 	int currentQuad=0;
 

@@ -1,3 +1,11 @@
+#ifndef QUADMESH
+#define QUADMESH
+#include <windows.h>
+#include <gl/gl.h>
+#include <math.h>
+#include <utility>
+#include <vector>
+#include "Vector3.h"
 struct MeshVertex
 {
 	Vector3	position;
@@ -28,18 +36,15 @@ private:
 
 	int numFacesDrawn;
 	
-	GLfloat mat_ambient[4];
-    GLfloat mat_specular[4];
-    GLfloat mat_diffuse[4];
-	GLfloat mat_shininess[1];
 
-	
-private:
-	bool CreateMemory();
+  bool CreateMemory();
 	void FreeMemory();
 
 public:
-
+  Vector3 mat_ambient;
+  Vector3 mat_specular;
+  Vector3 mat_diffuse;
+  GLfloat mat_shininess;
 	typedef std::pair<int, int> MaxMeshDim;
 
 	QuadMesh(int maxMeshSize = 40, float meshDim = 1.0f);
@@ -55,11 +60,10 @@ public:
 	}
 	
 	bool InitMesh(int meshSize, Vector3 origin, double meshLength, double meshWidth,Vector3 dir1, Vector3 dir2);
-	void DrawMesh(int meshSize);
-	void UpdateMesh();
-	void QuadMesh::SetMaterial(Vector3 ambient, Vector3 diffuse, Vector3 specular, double shininess);
-	void ComputeNormals();
+	void DrawMesh(int meshSize) const;
+	void ComputeNormals() const;
 	
 	
 };
+#endif //QUADMESH
 

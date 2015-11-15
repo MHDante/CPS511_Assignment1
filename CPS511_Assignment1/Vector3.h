@@ -16,6 +16,8 @@
 #ifndef VECTOR3D_H
 #define VECTOR3D_H
 
+#include <math.h>
+#include <gl/gl.h>
 class Vector3
 {
 public:
@@ -60,7 +62,7 @@ public:
 	
 	void Normalize()
 	{
-		const float norm = (float)sqrt(x*x+y*y+z*z);
+		const float norm = float(sqrt(x*x+y*y+z*z));
 		if(norm > 0)
 		{
 			x /= norm; y /= norm; z /= norm;
@@ -162,6 +164,15 @@ public:
 	float x;
 	float y;
 	float z;
+
+  GLfloat* toGLFloat4(GLfloat w) const
+  {
+    return new GLfloat[4]{ x,y,z,w };
+  }
+  GLfloat* toGLFloat3() const
+  {
+    return new GLfloat[3]{ x,y,z };
+  }
 };
 
 #endif	//VECTOR3D_H

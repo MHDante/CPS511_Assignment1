@@ -24,6 +24,15 @@
     <ClCompile Include="CubeMesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GLApp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CubeMesh.h">
@@ -32,7 +41,16 @@
     <ClInclude Include="QuadMesh.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="VECTOR3D.h">
+    <ClInclude Include="Camera.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GLApp.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Modeller.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector3.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
