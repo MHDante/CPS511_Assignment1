@@ -17,7 +17,7 @@ void Modeller:: setUpScene(){
   Vector3 origin = Vector3(-8.0f, 0.0f, 8.0f);
   Vector3 dir1v = Vector3(1.0f, 0.0f, 0.0f);
   Vector3 dir2v = Vector3(0.0f, 0.0f, -1.0f);
-  floorMesh = new QuadMesh(meshSize, 16.0);
+  floorMesh = new QuadMesh(meshSize);
   floorMesh->InitMesh(meshSize, origin, 16.0, 16.0, dir1v, dir2v);
   floorMesh->mat_diffuse = Vector3(0.9f, 0.5f, 0.0f);
 
@@ -26,21 +26,21 @@ void Modeller:: setUpScene(){
   origin = Vector3(-8.0f, 0.0f, 8.0f);
   dir1v = Vector3(0.0f, 0.0f, -1.0f);
   dir2v = Vector3(0.0f, .25f, 0.0f);
-  wallMeshes[0] = new QuadMesh(meshSize, 16.0);
+  wallMeshes[0] = new QuadMesh(meshSize);
   wallMeshes[0]->InitMesh(meshSize, origin, 16.0, 16.0, dir1v, dir2v);
   wallMeshes[0]->mat_diffuse = diffuse;
   
   origin = Vector3(8.0f, 0.0f, -8.0f);
   dir1v = Vector3(0.0f, 0.0f, 1.0f);
   dir2v = Vector3(0.0f, .25f, 0.0f);
-  wallMeshes[1] = new QuadMesh(meshSize, 16.0);
+  wallMeshes[1] = new QuadMesh(meshSize);
   wallMeshes[1]->InitMesh(meshSize, origin, 16.0, 16.0, dir1v, dir2v);
   wallMeshes[1]->mat_diffuse = diffuse;
   
   origin = Vector3(-8.0f, 0.0f, -8.0f);
   dir1v = Vector3(1.0f, 0.0f, 0.0f);
   dir2v = Vector3(0.0f, .25f, 0.0f);
-  wallMeshes[2] = new QuadMesh(meshSize, 16.0);
+  wallMeshes[2] = new QuadMesh(meshSize);
   wallMeshes[2]->InitMesh(meshSize, origin, 16.0, 16.0, dir1v, dir2v);
   wallMeshes[2]->mat_diffuse = diffuse;
 

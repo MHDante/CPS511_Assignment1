@@ -1,16 +1,15 @@
 #include "QuadMesh.h"
 
-QuadMesh::QuadMesh(int maxMeshSize, float meshDim)
+QuadMesh::QuadMesh(int MaxMeshSize)
 {
   minMeshSize = 1;
   numVertices = 0;
-  vertices = nullptr;
   numQuads = 0;
-  quads = nullptr;
 
-  this->maxMeshSize = maxMeshSize < minMeshSize ? minMeshSize : maxMeshSize;
-  this->meshDim = meshDim;
-  CreateMemory();
+  maxMeshSize = MaxMeshSize < minMeshSize ? minMeshSize : MaxMeshSize;
+  vertices = new Vector3[(MaxMeshSize + 1)*(MaxMeshSize + 1)]();
+  normals = new Vector3[(MaxMeshSize + 1)*(MaxMeshSize + 1)]();
+  quads = new GLuint[MaxMeshSize*MaxMeshSize * 4]();
 
   // Setup the material and lights used for the mesh
   mat_ambient = Vector3(0, 0, 0);
@@ -19,26 +18,23 @@ QuadMesh::QuadMesh(int maxMeshSize, float meshDim)
   mat_shininess = 0.0;
 
 }
-
-bool QuadMesh::CreateMemory()
-{
-  vertices = new Vector3[(maxMeshSize + 1)*(maxMeshSize + 1)]();
-  normals = new Vector3[(maxMeshSize + 1)*(maxMeshSize + 1)]();
-  quads = new GLuint[maxMeshSize*maxMeshSize * 4]();
-  if (!vertices || !normals || !quads)
-  {
-    return false;
-  }
-
-  return true;
+QuadMesh::~QuadMesh() {
+  if (vertices)
+    delete[] vertices;
+  vertices = nullptr;
+  if (normals)
+    delete[] normals;
+  normals = nullptr;
+  numVertices = 0;
+  if (quads)
+    delete[] quads;
+  quads = nullptr;
+  numQuads = 0;
 }
-
 
 
 bool QuadMesh::InitMesh(int meshSize, Vector3 origin, double meshLength, double meshWidth, Vector3 dir1, Vector3 dir2)
 {
-
-
 
   numVertices = (meshSize + 1)*(meshSize + 1);
   dir1 *= meshLength / meshSize;
@@ -87,19 +83,6 @@ void QuadMesh::DrawMesh(int meshSize) const
   glNormalPointer(GL_FLOAT, sizeof(Vector3), normals);
   glVertexPointer(3, GL_FLOAT, sizeof(Vector3), vertices);
   glDrawElements(GL_QUADS, numQuads*4, GL_UNSIGNED_INT, quads);
-}
-
-void QuadMesh::FreeMemory()
-{
-  if (vertices)
-    delete[] vertices;
-  vertices = nullptr;
-  numVertices = 0;
-
-  if (quads)
-    delete[] quads;
-  quads = nullptr;
-  numQuads = 0;
 }
 
 void QuadMesh::ComputeNormals() const
