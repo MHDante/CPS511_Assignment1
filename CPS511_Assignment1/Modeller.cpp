@@ -17,12 +17,12 @@ void Modeller:: setUpScene(){
   Vector3 origin = Vector3(-8.0f, 0.0f, 8.0f);
   Vector3 dir1v = Vector3(1.0f, 0.0f, 0.0f);
   Vector3 dir2v = Vector3(0.0f, 0.0f, -1.0f);
+  Vector4 diffuse = Vector4(0.9f, 0.5f, 0.0f, 1);
   floorMesh = new QuadMesh(meshSize);
   floorMesh->InitMesh(meshSize, origin, 16.0, 16.0, dir1v, dir2v);
-  floorMesh->mat_diffuse = Vector3(0.9f, 0.5f, 0.0f);
+  floorMesh->mat_diffuse = diffuse;
 
-
-  auto diffuse = Vector3(0, 1, 0.0f);
+  diffuse = Vector4(0, 1, 0.0f, 4);
   origin = Vector3(-8.0f, 0.0f, 8.0f);
   dir1v = Vector3(0.0f, 0.0f, -1.0f);
   dir2v = Vector3(0.0f, .25f, 0.0f);
@@ -55,6 +55,7 @@ void Modeller:: setUpScene(){
   mainCamera->aspect = 1.0;
   mainCamera->nearZ = 0.2;
   mainCamera->farZ = 40.0;
+
 }
 
 
@@ -277,7 +278,7 @@ void Modeller:: setUpScene(){
       {
         diff *= -1;
         first = false;
-        goto attempt;
+        goto attempt; //MWAHAHAHA
       }
     }
 

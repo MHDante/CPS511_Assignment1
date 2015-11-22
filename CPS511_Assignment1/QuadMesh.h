@@ -20,9 +20,9 @@ private:
   GLuint *quads;
   
 public:
-  Vector3 mat_ambient;
-  Vector3 mat_specular;
-  Vector3 mat_diffuse;
+  Vector4 mat_ambient;
+  Vector4 mat_specular;
+  Vector4 mat_diffuse;
   GLfloat mat_shininess;
 
   explicit QuadMesh(int maxMeshSize = 40);

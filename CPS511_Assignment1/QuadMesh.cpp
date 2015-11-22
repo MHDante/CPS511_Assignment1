@@ -12,9 +12,9 @@ QuadMesh::QuadMesh(int MaxMeshSize)
   quads = new GLuint[MaxMeshSize*MaxMeshSize * 4]();
 
   // Setup the material and lights used for the mesh
-  mat_ambient = Vector3(0, 0, 0);
-  mat_specular = Vector3(0, 0, 0);
-  mat_diffuse = Vector3(.9, .5, .0);
+  mat_ambient = Vector4(0, 0, 0,1);
+  mat_specular = Vector4(0, 0, 0,1);
+  mat_diffuse = Vector4(.9, .5, .0,1);
   mat_shininess = 0.0;
 
 }
@@ -76,9 +76,9 @@ void QuadMesh::DrawMesh(int meshSize) const
 {
   int currentQuad = 0;
 
-  glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient.toGLFloat4(1.0));
-  glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular.toGLFloat4(1.0));
-  glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse.toGLFloat4(1.0));
+  glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
+  glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+  glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
   glMaterialfv(GL_FRONT, GL_SHININESS, &mat_shininess);
   glNormalPointer(GL_FLOAT, sizeof(Vector3), normals);
   glVertexPointer(3, GL_FLOAT, sizeof(Vector3), vertices);

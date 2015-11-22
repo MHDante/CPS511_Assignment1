@@ -18,6 +18,16 @@
 #include <gl/gl.h>
 #include <string>
 
+
+struct Vector4 {
+  float x; float y; float z;  float w;
+  Vector4() :x(0), y(0), z(0), w(0) {};
+  Vector4(float _x, float _y, float _z, float _w) :x(_x), y(_y), z(_z), w(_w) {};
+
+  operator float* () const { return (float*) this; }
+  operator const float* () const { return (const float*) this; }
+};
+
 class Vector3
 {
 public:
@@ -87,7 +97,13 @@ public:
 	void RotateX(double angle);
 	Vector3 GetRotatedX(double angle) const;
 	void RotateY(double angle);
-	Vector3 GetRotatedY(double angle) const;
+	Vector3 GetRotatedY(double angle) const {
+
+    return Vector3(
+      (x / 2) * cos(angle) - (z / 2) * sin(angle),
+      y,
+      (z / 2) * cos(angle) + (x / 2) * sin(angle));
+	};
 	void RotateZ(double angle);
 	Vector3 GetRotatedZ(double angle) const;
 	void RotateAxis(double angle, const Vector3 & axis);
@@ -167,6 +183,8 @@ public:
 	operator float* () const {return (float*) this;}
 	operator const float* () const {return (const float*) this;}
 
+  //operator Vector4 () const { return Vector4(x,y,z,0); }
+
   std::string toString() const
   {
     return ("(" + std::to_string(x) + "," + std::to_string(y) + "," + std::to_string(z)+")");
@@ -176,14 +194,6 @@ public:
 	float y;
 	float z;
 
-  GLfloat* toGLFloat4(GLfloat w) const
-  {
-    return new GLfloat[4]{ x,y,z,w };
-  }
-  GLfloat* toGLFloat3() const
-  {
-    return new GLfloat[3]{ x,y,z };
-  }
 };
 
 #endif	//VECTOR3D_H
