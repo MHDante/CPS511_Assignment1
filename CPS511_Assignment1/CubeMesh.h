@@ -67,7 +67,11 @@ public:
   bool isWithin(BBox* container) const;
   BBox* getBBox() const;
   void drawCube() const;
-
+  bool translate(Vector3 diff, BBox* bounds);
+  bool scale(Vector3 diff, BBox* bounds);
+  bool rotate(Vector3 diff, BBox* bounds);
+  bool extrude(Vector3 diff, BBox* bounds);
+  bool raise(Vector3 diff, BBox* bounds);
   static bool singleSelecting;
 
 };

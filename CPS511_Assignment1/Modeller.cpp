@@ -11,10 +11,6 @@ Modeller::Modeller()
   windowName = "Scene Modeller";
 
 }
-void makeMesh(Vector3 topLeft, Vector3 botRight)
-{
-  
-}
 
 void Modeller:: setUpScene(){
   // Set up meshes
@@ -33,14 +29,14 @@ void Modeller:: setUpScene(){
   wallMeshes[0] = new QuadMesh(meshSize, 16.0);
   wallMeshes[0]->InitMesh(meshSize, origin, 16.0, 16.0, dir1v, dir2v);
   wallMeshes[0]->mat_diffuse = diffuse;
-
+  
   origin = Vector3(8.0f, 0.0f, -8.0f);
   dir1v = Vector3(0.0f, 0.0f, 1.0f);
   dir2v = Vector3(0.0f, .25f, 0.0f);
   wallMeshes[1] = new QuadMesh(meshSize, 16.0);
   wallMeshes[1]->InitMesh(meshSize, origin, 16.0, 16.0, dir1v, dir2v);
   wallMeshes[1]->mat_diffuse = diffuse;
-
+  
   origin = Vector3(-8.0f, 0.0f, -8.0f);
   dir1v = Vector3(1.0f, 0.0f, 0.0f);
   dir2v = Vector3(0.0f, .25f, 0.0f);
@@ -65,22 +61,20 @@ void Modeller:: setUpScene(){
   void Modeller::display(void)
   {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
     glLoadIdentity();
-
     // Set up the camera
     mainCamera->display();
-
     // Draw all cubes (see CubeMesh.h)
     for (auto c : cubes) {
       c->drawCube();
     }
-
     // Draw floor and wall meshes
     floorMesh->DrawMesh(meshSize);
     for (auto w : wallMeshes) {
       w->DrawMesh(meshSize);
     }
+    wallMeshes[0]->DrawMesh(meshSize);
+
     glDisable(GL_LIGHTING);
     glColor3f(1, 0, 0);
 
@@ -107,12 +101,14 @@ void Modeller:: setUpScene(){
       if (state == GLUT_DOWN)
       {
 
-        Vector3 dir2 = mainCamera->ScreenToWorld(x, y);
+        Vector3 dir2 = mainCamera->ScreenToWorldDir(x, y);
 
-        auto l = new Line();
-        l->from = Vector3();// mainCamera->pos;
-        l->to = dir2;
-        lines.push_back(l);
+        for (int i = 10; i < 44; i++){
+          auto l = new Line();
+          l->from = Vector3();// mainCamera->pos;
+          l->to = mainCamera->pos+ dir2*i;
+          lines.push_back(l);
+        }
         return;
 
       }
@@ -138,60 +134,6 @@ void Modeller:: setUpScene(){
       ;
     }
     glutPostRedisplay();
-  }
-
-
-
-
-
-
-  void Modeller::translate(Vector3 diff) {
-    bool clear = true;
-    for (auto c : selectedCubes) {
-      c->center += diff;
-      clear &= c->isWithin(roomBox);
-    }
-    if (!clear)
-      for (auto c : selectedCubes) {
-        c->center -= diff;
-      }
-  }
-  void Modeller::rotate(Vector3 diff) {
-    bool clear = true;
-    diff *= 5;
-    for (auto c : selectedCubes) {
-      c->angle = int(c->angle + diff.x + diff.z) % 360;
-      clear &= c->isWithin(roomBox);
-    }
-    if (!clear)
-      for (auto c : selectedCubes) {
-        c->angle = int(c->angle - diff.x - diff.z) % 360;
-      }
-  }
-  void Modeller::extrude(Vector3 diff) {
-    bool clear = true;
-    for (auto c : selectedCubes) {
-      c->dim.SetY(c->dim.y + diff.x - diff.z);
-      c->center.SetY(c->center.y + (diff.x - diff.z)*.5);
-      clear &= c->isWithin(roomBox) && c->dim.y > 0.1;
-    }
-    if (!clear)
-      for (auto c : selectedCubes) {
-        c->dim.SetY(c->dim.y - diff.x + diff.z);
-        c->center.SetY(c->center.y - (diff.x - diff.z)*.5);
-      }
-  }
-
-  void Modeller::raise(Vector3 diff) {
-    bool clear = true;
-    for (auto c : selectedCubes) {
-      c->center.SetY(c->center.y + (diff.x - diff.z)*.5);
-      clear &= c->isWithin(roomBox);
-    }
-    if (!clear)
-      for (auto c : selectedCubes) {
-        c->center.SetY(c->center.y - (diff.x - diff.z)*.5);
-      }
   }
 
   void Modeller::selectCube(CubeMesh* cube) {
@@ -266,25 +208,6 @@ void Modeller:: setUpScene(){
 
   }
 
-  void Modeller::scale(Vector3 diff) {
-    float x = diff.x == 1 ? 1.25f : diff.x == -1 ? 0.8f : 1;
-    float z = diff.z == 1 ? 1.25f : diff.z == -1 ? 0.8f : 1;
-
-    bool clear = true;
-    for (auto c : selectedCubes) {
-      c->dim.SetX(c->dim.x * x);
-      c->dim.SetZ(c->dim.z * z);
-      clear &= c->isWithin(roomBox) && c->dim.x > 0.1 && c->dim.z > 0.1;
-    }
-    if (!clear) {
-      float x2 = diff.x == 1 ? 0.8f : diff.x == -1 ? 1.25f : 1;
-      float z2 = diff.z == 1 ? 0.8f : diff.z == -1 ? 1.25f : 1;
-      for (auto c : selectedCubes) {
-        c->dim.SetX(c->dim.x * x2);
-        c->dim.SetZ(c->dim.z * z2);
-      }
-    }
-  }
 
   /* Handles input from the keyboard, non-arrow keys */
   void Modeller::keyboard(unsigned char key, int x, int y)
@@ -332,29 +255,29 @@ void Modeller:: setUpScene(){
       selectCube(c);
       break;
     }
-    case GLUT_KEY_DOWN:
-      diff.SetZ(1);
-      break;
-    case GLUT_KEY_UP:
-      diff.SetZ(-1);
-      break;
-    case GLUT_KEY_RIGHT:
-      diff.SetX(1);
-      break;
-    case GLUT_KEY_LEFT:
-      diff.SetX(-1);
-      break;
-
+    case GLUT_KEY_DOWN:   diff.SetZ(1);   break;
+    case GLUT_KEY_UP:     diff.SetZ(-1);  break;
+    case GLUT_KEY_RIGHT:  diff.SetX(1);   break;
+    case GLUT_KEY_LEFT:   diff.SetX(-1);  break;
     }
     if (diff.GetLength() > 0) {
+      bool first = true;
+      bool clear = true;
+      attempt:
       switch (currentAction) {
-      case TRANSLATE: translate(diff); break;
-      case SCALE: scale(diff); break;
-      case ROTATE: rotate(diff); break;
-      case EXTRUDE: extrude(diff); break;
-      case RAISE: raise(diff); break;
-      case SELECT: select(diff); break;
-      case MULTIPLESELECT: select(diff); break;
+      case TRANSLATE: for (auto c : selectedCubes) clear &= c->translate(diff, roomBox); break;
+      case SCALE:     for (auto c : selectedCubes) clear &= c->scale(diff, roomBox); break;
+      case ROTATE:    for (auto c : selectedCubes) clear &= c->rotate(diff, roomBox); break;
+      case EXTRUDE:   for (auto c : selectedCubes) clear &= c->extrude(diff, roomBox); break;
+      case RAISE:     for (auto c : selectedCubes) clear &= c->raise(diff, roomBox); break;
+      case SELECT:          select(diff); break;
+      case MULTIPLESELECT:  select(diff); break;
+      }
+      if(first&& !clear)
+      {
+        diff *= -1;
+        first = false;
+        goto attempt;
       }
     }
 

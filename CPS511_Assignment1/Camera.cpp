@@ -1,5 +1,6 @@
 ﻿#include "Camera.h"
 #include "GLApp.h"
+#include <iostream>
 
 Camera::Camera(GLApp* gl_app) {
     glApp = gl_app;
@@ -7,6 +8,9 @@ Camera::Camera(GLApp* gl_app) {
     aspect = glApp->ScreenWidth / glApp->ScreenHeight;
     nearZ = 0.3;
     farZ = 100;
+    target = Vector3(0,0,0);
+    pos = Vector3(0,0,10);
+    up = Vector3(0, 1, 0);
   }
 
   void Camera::display() const
@@ -18,14 +22,34 @@ Camera::Camera(GLApp* gl_app) {
     gluPerspective(fovY, aspect, nearZ, farZ);
   }
 
-  Vector3 Camera::ScreenToWorld(int x, int y) const
+  Vector3 Camera::ScreenToWorldDir(int x, int y) const
   {
-    Vector3 eyeDir = Vector3(x / (glApp->ScreenWidth / 2.0) - 1, y / (glApp->ScreenHeight / 2.0) - 1, 1 / tan(0.523599)) * 22;
-    auto camTarget = Vector3() - pos;
-    auto angle = -atan2(camTarget.y, camTarget.z);
+    auto deg2Rad = (M_PI / 180);
+    y = glApp->ScreenHeight -y; //Opengl...
+    float xRatio = (glApp->ScreenWidth / 2.0);
+    float yRatio = (glApp->ScreenHeight / 2.0);
+    float zRatio = tan(fovY * deg2Rad);
+    Vector3 eyeDir = Vector3(x / xRatio, y/yRatio, zRatio);
+    eyeDir.x *= aspect;
+    eyeDir -= Vector3(1, 1, 0);
+    eyeDir.Normalize();
+
+    auto fwdVector = (target - pos);
+    auto rightVector = fwdVector.CrossProduct(up);
+    auto upVector = rightVector.CrossProduct(fwdVector);
+
+    fwdVector.Normalize();
+    rightVector.Normalize();
+    upVector.Normalize();
+    
+
     auto dir2 = Vector3(
-      eyeDir.x,
-      eyeDir.y * cos(angle) - eyeDir.z* sin(angle),
-      eyeDir.y* sin(angle) + eyeDir.z * cos(angle));
-    return dir2;
+      eyeDir.x*rightVector.x + eyeDir.y*upVector.x + eyeDir.z*fwdVector.x,
+      eyeDir.x*rightVector.y + eyeDir.y*upVector.y + eyeDir.z*fwdVector.y,
+      eyeDir.x*rightVector.z + eyeDir.y*upVector.z + eyeDir.z*fwdVector.z
+      );
+
+    auto vector3 = dir2;
+    std::cout << vector3.toString() << std::endl;
+    return vector3;
   }

@@ -3,6 +3,7 @@
 #include <windows.h>
 #include <gl/glu.h>
 #include <gl/glut.h>
+#define _USE_MATH_DEFINES
 #include <math.h>
 #include <vector>
 #include "Vector3.h"
@@ -23,6 +24,6 @@ public:
   Camera::Camera(GLApp* gl_app);
  void display() const;
   void perspective() const;
-  Vector3 ScreenToWorld(int x, int y) const;
+  Vector3 ScreenToWorldDir(int x, int y) const;
 };
 #endif

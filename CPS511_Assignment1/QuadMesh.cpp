@@ -2,226 +2,137 @@
 
 QuadMesh::QuadMesh(int maxMeshSize, float meshDim)
 {
-	minMeshSize =1;
-	numVertices = 0;
-	vertices = nullptr;
-	numQuads = 0;
-	quads = nullptr;
-	numFacesDrawn = 0;
-	
-	this->maxMeshSize = maxMeshSize < minMeshSize ? minMeshSize : maxMeshSize;
-	this->meshDim = meshDim;
-	CreateMemory();
+  minMeshSize = 1;
+  numVertices = 0;
+  vertices = nullptr;
+  numQuads = 0;
+  quads = nullptr;
 
-	// Setup the material and lights used for the mesh
-  mat_ambient = Vector3();
-	mat_specular = Vector3();
-	mat_diffuse= Vector3(.9,.5,.0);
-	mat_shininess = 0.0;
-    
+  this->maxMeshSize = maxMeshSize < minMeshSize ? minMeshSize : maxMeshSize;
+  this->meshDim = meshDim;
+  CreateMemory();
+
+  // Setup the material and lights used for the mesh
+  mat_ambient = Vector3(0, 0, 0);
+  mat_specular = Vector3(0, 0, 0);
+  mat_diffuse = Vector3(.9, .5, .0);
+  mat_shininess = 0.0;
+
 }
 
 bool QuadMesh::CreateMemory()
 {
-	vertices = new MeshVertex[(maxMeshSize+1)*(maxMeshSize+1)];
-	if(!vertices)
-	{
-		return false;
-	}
+  vertices = new Vector3[(maxMeshSize + 1)*(maxMeshSize + 1)]();
+  normals = new Vector3[(maxMeshSize + 1)*(maxMeshSize + 1)]();
+  quads = new GLuint[maxMeshSize*maxMeshSize * 4]();
+  if (!vertices || !normals || !quads)
+  {
+    return false;
+  }
 
-	quads = new MeshQuad[maxMeshSize*maxMeshSize];
-	if(!quads)
-	{
-		return false;
-	}
-
-	return true;
+  return true;
 }
-		
 
 
-bool QuadMesh::InitMesh(int meshSize,Vector3 origin,double meshLength,double meshWidth,Vector3 dir1, Vector3 dir2)
+
+bool QuadMesh::InitMesh(int meshSize, Vector3 origin, double meshLength, double meshWidth, Vector3 dir1, Vector3 dir2)
 {
-	Vector3 o;
-	int currentVertex = 0; 	  
-	double sf1,sf2; 
-    
-	Vector3 v1,v2;
-	
-	v1.x = dir1.x;
-	v1.y = dir1.y;
-	v1.z = dir1.z;
 
-	sf1 = meshLength/meshSize;
-	v1 *= sf1;
 
-	v2.x = dir2.x;
-	v2.y = dir2.y;
-	v2.z = dir2.z;
-	sf2 = meshWidth/meshSize;
-	v2 *= sf2;
-    
-	Vector3 meshpt;
-	
-	// VERTICES
-	numVertices=(meshSize+1)*(meshSize+1);
-	
-	// Starts at front left corner of mesh 
-	o.Set(origin.x,origin.y,origin.z);
 
-	for(int i=0; i< meshSize+1; i++)
-	{
-		for(int j=0; j< meshSize+1; j++)
-		{
-			// compute vertex position along mesh row (along x direction)
-			meshpt.x = o.x + j * v1.x;
-			meshpt.y = o.y + j * v1.y;
-			meshpt.z = o.z + j * v1.z;
-            
-			vertices[currentVertex].position.Set(meshpt.x,meshpt.y,meshpt.z);
-			currentVertex++;
-		}
-		// go to next row in mesh (negative z direction)
-		o += v2;
-	}
-	
-	// Build Quad Polygons
-	numQuads=(meshSize)*(meshSize);
-	int currentQuad=0;
+  numVertices = (meshSize + 1)*(meshSize + 1);
+  dir1 *= meshLength / meshSize;
+  dir2 *= meshWidth / meshSize;
 
-	for(int j=0; j < meshSize; j++)
-	{
-		for(int k=0; k < meshSize; k++)
-		{
-			// Counterclockwise order
-			quads[currentQuad].vertices[0]=&vertices[j*    (meshSize+1)+k];
-			quads[currentQuad].vertices[1]=&vertices[j*    (meshSize+1)+k+1];
-			quads[currentQuad].vertices[2]=&vertices[(j+1)*(meshSize+1)+k+1];
-			quads[currentQuad].vertices[3]=&vertices[(j+1)*(meshSize+1)+k];
-			currentQuad++;
-		}
-	}
+  int currentVertex = 0;
+  for (int i = 0; i< meshSize + 1; i++){
+    for (int j = 0; j< meshSize + 1; j++){
+      vertices[currentVertex] = origin + dir1 * j;
+      currentVertex++;
+    }
+    origin += dir2; // go to next row in mesh (negative z direction)
+  }
 
-    this->ComputeNormals();
+  // Build Quad Polygons
+  numQuads = (meshSize)*(meshSize);
+  int currentQuad = 0;
 
-	return true;
+  for (int j = 0; j < meshSize; j++)
+  {
+    for (int k = 0; k < meshSize; k++)
+    {
+      // Counterclockwise order
+      quads[currentQuad++] = j*    (meshSize + 1) + k;
+      quads[currentQuad++] = j*    (meshSize + 1) + k + 1;
+      quads[currentQuad++] = (j + 1)*(meshSize + 1) + k + 1;
+      quads[currentQuad++] = (j + 1)*(meshSize + 1) + k;
+    }
+  }
+
+  this->ComputeNormals();
+  glEnableClientState(GL_NORMAL_ARRAY);
+  glEnableClientState(GL_VERTEX_ARRAY);
+
+  return true;
 }
 
 void QuadMesh::DrawMesh(int meshSize) const
 {
-	int currentQuad=0;
+  int currentQuad = 0;
 
-	glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient.toGLFloat4(1.0));
-	glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular.toGLFloat4(1.0));
-	glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse.toGLFloat4(1.0));
-	glMaterialfv(GL_FRONT, GL_SHININESS, &mat_shininess);
-
-	for(int j=0; j< meshSize; j++)
-	{
-		for(int k=0; k< meshSize; k++)
-		{
-			glBegin(GL_QUADS);
-			
-			glNormal3f(quads[currentQuad].vertices[0]->normal.x,
-				       quads[currentQuad].vertices[0]->normal.y,
-					   quads[currentQuad].vertices[0]->normal.z);
-			glVertex3f(quads[currentQuad].vertices[0]->position.x,
-				       quads[currentQuad].vertices[0]->position.y,
-					   quads[currentQuad].vertices[0]->position.z);
-			
-			glNormal3f(quads[currentQuad].vertices[1]->normal.x,
-				       quads[currentQuad].vertices[1]->normal.y,
-					   quads[currentQuad].vertices[1]->normal.z);
-			
-			glVertex3f(quads[currentQuad].vertices[1]->position.x,
-				       quads[currentQuad].vertices[1]->position.y,
-					   quads[currentQuad].vertices[1]->position.z);
-			
-			glNormal3f(quads[currentQuad].vertices[2]->normal.x,
-				       quads[currentQuad].vertices[2]->normal.y,
-					   quads[currentQuad].vertices[2]->normal.z);
-			
-			glVertex3f(quads[currentQuad].vertices[2]->position.x,
-				       quads[currentQuad].vertices[2]->position.y,
-					   quads[currentQuad].vertices[2]->position.z);
-			
-			glNormal3f(quads[currentQuad].vertices[3]->normal.x,
-				       quads[currentQuad].vertices[3]->normal.y,
-					   quads[currentQuad].vertices[3]->normal.z);
-			
-			glVertex3f(quads[currentQuad].vertices[3]->position.x,
-				       quads[currentQuad].vertices[3]->position.y,
-					   quads[currentQuad].vertices[3]->position.z);
-			glEnd();
-			currentQuad++;
-		}
-	}
+  glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient.toGLFloat4(1.0));
+  glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular.toGLFloat4(1.0));
+  glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse.toGLFloat4(1.0));
+  glMaterialfv(GL_FRONT, GL_SHININESS, &mat_shininess);
+  glNormalPointer(GL_FLOAT, sizeof(Vector3), normals);
+  glVertexPointer(3, GL_FLOAT, sizeof(Vector3), vertices);
+  glDrawElements(GL_QUADS, numQuads*4, GL_UNSIGNED_INT, quads);
 }
-
-
-
-
-
-
 
 void QuadMesh::FreeMemory()
 {
-	if(vertices)
-		delete [] vertices;
-	vertices= nullptr;
-	numVertices=0;
+  if (vertices)
+    delete[] vertices;
+  vertices = nullptr;
+  numVertices = 0;
 
-	if(quads)
-		delete [] quads;
-	quads= nullptr;
-	numQuads=0;
+  if (quads)
+    delete[] quads;
+  quads = nullptr;
+  numQuads = 0;
 }
 
 void QuadMesh::ComputeNormals() const
 {
-	int currentQuad=0;
+  int currentQuad = 0;
 
-	for(int j=0; j< this->maxMeshSize; j++)
-	{
-		for(int k=0; k< this->maxMeshSize; k++)
-		{
-			Vector3 n0,n1,n2,n3,e0,e1,e2,e3,ne0,ne1,ne2,ne3;
-			
-			quads[currentQuad].vertices[0]->normal.LoadZero();
-			quads[currentQuad].vertices[1]->normal.LoadZero();
-			quads[currentQuad].vertices[2]->normal.LoadZero();
-			quads[currentQuad].vertices[3]->normal.LoadZero();
-			e0 = quads[currentQuad].vertices[1]->position - quads[currentQuad].vertices[0]->position; 
-			e1 = quads[currentQuad].vertices[2]->position - quads[currentQuad].vertices[1]->position; 
-			e2 = quads[currentQuad].vertices[3]->position - quads[currentQuad].vertices[2]->position; 
-			e3 = quads[currentQuad].vertices[0]->position - quads[currentQuad].vertices[3]->position; 
-			e0.Normalize();
-			e1.Normalize();
-			e2.Normalize();
-			e3.Normalize();
-			
-			n0 = e0.CrossProduct(-e3);
-			n0.Normalize();
-			quads[currentQuad].vertices[0]->normal += n0;
-			
-			n1 = e1.CrossProduct(-e0);
-			n1.Normalize();
-			quads[currentQuad].vertices[1]->normal += n1;
+  for (int j = 0; j< this->maxMeshSize; j++)
+  {
+    for (int k = 0; k< this->maxMeshSize; k++)
+    {
+      Vector3 n0, n1, n2, n3, e0, e1, e2, e3, ne0, ne1, ne2, ne3;
 
-			n2 = e2.CrossProduct(-e1);
-			n2.Normalize();
-			quads[currentQuad].vertices[2]->normal += n2;
+      e0 = vertices[quads[currentQuad * 4 + 1]] - vertices[quads[currentQuad * 4 + 0]];
+      e1 = vertices[quads[currentQuad * 4 + 2]] - vertices[quads[currentQuad * 4 + 1]];
+      e2 = vertices[quads[currentQuad * 4 + 3]] - vertices[quads[currentQuad * 4 + 2]];
+      e3 = vertices[quads[currentQuad * 4 + 0]] - vertices[quads[currentQuad * 4 + 3]];
 
-			n3 = e3.CrossProduct(-e2);
-			n3.Normalize();
-			quads[currentQuad].vertices[3]->normal += n3;
-			
-			quads[currentQuad].vertices[0]->normal.Normalize();
-			quads[currentQuad].vertices[1]->normal.Normalize();
-			quads[currentQuad].vertices[2]->normal.Normalize();
-			quads[currentQuad].vertices[3]->normal.Normalize();
-			
-			currentQuad++;
-		}
-	}
+      e0.Normalize();
+      e1.Normalize();
+      e2.Normalize();
+      e3.Normalize();
+
+      normals[quads[currentQuad * 4 + 0]] += e0.CrossProduct(-e3).Normalized();
+      normals[quads[currentQuad * 4 + 1]] += e1.CrossProduct(-e0).Normalized();
+      normals[quads[currentQuad * 4 + 2]] += e2.CrossProduct(-e1).Normalized();
+      normals[quads[currentQuad * 4 + 3]] += e3.CrossProduct(-e2).Normalized();
+
+      normals[quads[currentQuad*4+0]].Normalize();
+      normals[quads[currentQuad*4+1]].Normalize();
+      normals[quads[currentQuad*4+2]].Normalize();
+      normals[quads[currentQuad*4+3]].Normalize();
+
+      currentQuad++;
+    }
+  }
 }

@@ -15,9 +15,9 @@
 
 #ifndef VECTOR3D_H
 #define VECTOR3D_H
-
-#include <math.h>
 #include <gl/gl.h>
+#include <string>
+
 class Vector3
 {
 public:
@@ -69,9 +69,16 @@ public:
 		}
 	}
 
+  Vector3 Normalized() const
+	{
+    Vector3 res = Vector3(*this);
+    res.Normalize();
+    return res;
+	}
+
 	
 	float GetLength() const
-	{	return (float)sqrt((x*x)+(y*y)+(z*z));	}
+	{	return float(sqrt((x*x)+(y*y)+(z*z)));	}
 	
 	float GetQuaddLength() const
 	{	return (x*x)+(y*y)+(z*z);	}
@@ -116,14 +123,14 @@ public:
 	friend Vector3 operator*(float scaleFactor, const Vector3 & rhs);
 
 	//Add, subtract etc, saving the construction of a temporary
-	void Add(const Vector3 & v2, Vector3 & result)
+	void Add(const Vector3 & v2, Vector3 & result) const
 	{
 		result.x=x+v2.x;
 		result.y=y+v2.y;
 		result.z=z+v2.z;
 	}
 
-	void Subtract(const Vector3 & v2, Vector3 & result)
+	void Subtract(const Vector3 & v2, Vector3 & result) const
 	{
 		result.x=x-v2.x;
 		result.y=y-v2.y;
@@ -160,7 +167,11 @@ public:
 	operator float* () const {return (float*) this;}
 	operator const float* () const {return (const float*) this;}
 
-	//member variables
+  std::string toString() const
+  {
+    return ("(" + std::to_string(x) + "," + std::to_string(y) + "," + std::to_string(z)+")");
+	}
+  //member variables
 	float x;
 	float y;
 	float z;

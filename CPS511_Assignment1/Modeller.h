@@ -1,6 +1,7 @@
 #ifndef MODELLER
 #define MODELLER
 
+#include "QuadMesh.h"
 #include <windows.h>
 #include <gl/gl.h>
 #include <gl/glu.h>
@@ -12,7 +13,6 @@
 #include <list>
 #include "Vector3.h"
 #include "CubeMesh.h"
-#include "QuadMesh.h"
 #include "GLApp.h"
 
 class Modeller: public GLApp
@@ -30,13 +30,8 @@ public:
   void mouseMotionHandler(int xMouse, int yMouse) override;
   void keyboard(unsigned char key, int x, int y) override;
   void functionKeys(int key, int x, int y) override;
-  void translate(Vector3 diff);
-  void rotate(Vector3 diff);
-  void extrude(Vector3 diff);
-  void raise(Vector3 diff);
   void selectCube(CubeMesh* cube);
   void select(Vector3 diff);
-  void scale(Vector3 diff);
 
   enum Action { TRANSLATE, ROTATE, SCALE, EXTRUDE, RAISE, SELECT, MULTIPLESELECT };
   enum Action currentAction = TRANSLATE;

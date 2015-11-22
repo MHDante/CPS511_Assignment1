@@ -120,8 +120,9 @@ void CubeMesh::drawCube() const
     glPopMatrix();
   }
 
-  glScalef(dim.x/2, dim.y/2, dim.z/2);
   glRotatef(angle, 0, 1, 0);
+
+  glScalef(dim.x/2, dim.y/2, dim.z/2);
 
   
   
@@ -184,4 +185,40 @@ void CubeMesh::drawCube() const
   glEnd();
   glPopMatrix();
   glPopAttrib();
+}
+
+bool CubeMesh::translate(Vector3 diff, BBox* bounds)
+{
+  center += diff*.2;
+  return isWithin(bounds);
+}
+
+bool CubeMesh::scale(Vector3 diff, BBox* bounds)
+{
+
+  diff.x = diff.x == 1 ? 1.25f : diff.x == -1 ? 0.8f : 1;
+  diff.z = diff.z == -1 ? 1.25f : diff.z == 1 ? 0.8f : 1;
+  if ((angle > 45 && angle < 135) || (angle > 225 && angle < 315)) diff = Vector3(diff.z, 0, diff.x);
+  dim.SetX(dim.x * diff.x);
+  dim.SetZ(dim.z * diff.z);
+  return isWithin(bounds) && dim.x > 0.1 && dim.z > 0.1;
+}
+bool CubeMesh::rotate(Vector3 diff, BBox* bounds)
+{
+  diff *= 5;
+  angle = int(angle + diff.x + diff.z) % 360;
+  return isWithin(bounds);
+}
+bool CubeMesh::extrude(Vector3 diff, BBox* bounds)
+{
+  dim.SetY(dim.y + diff.x - diff.z);
+  center.SetY(center.y + (diff.x - diff.z)*.5);
+
+  return isWithin(bounds) && dim.y > 0.1;;
+}
+bool CubeMesh::raise(Vector3 diff, BBox* bounds)
+{
+  center.SetY(center.y + (diff.x - diff.z)*.5);
+
+  return isWithin(bounds);
 }
