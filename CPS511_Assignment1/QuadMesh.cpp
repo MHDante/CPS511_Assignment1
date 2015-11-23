@@ -1,121 +1,75 @@
 #include "QuadMesh.h"
 
-QuadMesh::QuadMesh(int MaxMeshSize)
-{
-  minMeshSize = 1;
-  numVertices = 0;
-  numQuads = 0;
+QuadMesh::QuadMesh(int meshSize, Vector3 origin, Vector3 length, Vector3 width) : origin(origin), length(length), width(width) {
 
-  maxMeshSize = MaxMeshSize < minMeshSize ? minMeshSize : MaxMeshSize;
-  vertices = new Vector3[(MaxMeshSize + 1)*(MaxMeshSize + 1)]();
-  normals = new Vector3[(MaxMeshSize + 1)*(MaxMeshSize + 1)]();
-  quads = new GLuint[MaxMeshSize*MaxMeshSize * 4]();
+  normal = length.CrossProduct(width).Normalized();
+  numVertices = (meshSize + 1) * (meshSize + 1);
+  numQuads = (meshSize)* (meshSize);
+  vertices = new Vector3[numVertices];
+  quads = new GLuint[numQuads * 4];
 
   // Setup the material and lights used for the mesh
-  mat_ambient = Vector4(0, 0, 0,1);
-  mat_specular = Vector4(0, 0, 0,1);
-  mat_diffuse = Vector4(.9, .5, .0,1);
-  mat_shininess = 0.0;
+  material = Material(
+    Vector4(0, 0, 0, 1),
+    Vector4(0, 0, 0, 1),
+    Vector4(.9, .5, .0, 1),
+    0.0);
 
-}
-QuadMesh::~QuadMesh() {
-  if (vertices)
-    delete[] vertices;
-  vertices = nullptr;
-  if (normals)
-    delete[] normals;
-  normals = nullptr;
-  numVertices = 0;
-  if (quads)
-    delete[] quads;
-  quads = nullptr;
-  numQuads = 0;
-}
-
-
-bool QuadMesh::InitMesh(int meshSize, Vector3 origin, double meshLength, double meshWidth, Vector3 dir1, Vector3 dir2)
-{
-
-  numVertices = (meshSize + 1)*(meshSize + 1);
-  dir1 *= meshLength / meshSize;
-  dir2 *= meshWidth / meshSize;
+  length /= meshSize;
+  width /= meshSize;
 
   int currentVertex = 0;
-  for (int i = 0; i< meshSize + 1; i++){
-    for (int j = 0; j< meshSize + 1; j++){
-      vertices[currentVertex] = origin + dir1 * j;
-      currentVertex++;
+  for (int i = 0; i < meshSize + 1; i++) {
+    for (int j = 0; j < meshSize + 1; j++) {
+      vertices[currentVertex++] = origin + length * j;
     }
-    origin += dir2; // go to next row in mesh (negative z direction)
+    origin += width; // go to next row in mesh (negative z direction)
   }
 
   // Build Quad Polygons
-  numQuads = (meshSize)*(meshSize);
   int currentQuad = 0;
-
-  for (int j = 0; j < meshSize; j++)
-  {
-    for (int k = 0; k < meshSize; k++)
-    {
+  for (int j = 0; j < meshSize; j++) {
+    for (int k = 0; k < meshSize; k++) {
       // Counterclockwise order
-      quads[currentQuad++] = j*    (meshSize + 1) + k;
-      quads[currentQuad++] = j*    (meshSize + 1) + k + 1;
-      quads[currentQuad++] = (j + 1)*(meshSize + 1) + k + 1;
-      quads[currentQuad++] = (j + 1)*(meshSize + 1) + k;
+      quads[currentQuad++] = j * (meshSize + 1) + k;
+      quads[currentQuad++] = j * (meshSize + 1) + k + 1;
+      quads[currentQuad++] = (j + 1) * (meshSize + 1) + k + 1;
+      quads[currentQuad++] = (j + 1) * (meshSize + 1) + k;
     }
   }
-
-  this->ComputeNormals();
-  glEnableClientState(GL_NORMAL_ARRAY);
   glEnableClientState(GL_VERTEX_ARRAY);
-
-  return true;
 }
 
-void QuadMesh::DrawMesh(int meshSize) const
-{
-  int currentQuad = 0;
+QuadMesh::~QuadMesh() {
+  if (vertices) delete[] vertices;
+  if (quads) delete[] quads;
+}
 
-  glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
-  glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
-  glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
-  glMaterialfv(GL_FRONT, GL_SHININESS, &mat_shininess);
-  glNormalPointer(GL_FLOAT, sizeof(Vector3), normals);
+void QuadMesh::DrawMesh(Material* mat) const {
+  (mat == nullptr?material:*mat).glApply();
+  glNormal3f(normal.x, normal.y, normal.z);
   glVertexPointer(3, GL_FLOAT, sizeof(Vector3), vertices);
-  glDrawElements(GL_QUADS, numQuads*4, GL_UNSIGNED_INT, quads);
+  glDrawElements(GL_QUADS, numQuads * 4, GL_UNSIGNED_INT, quads);
 }
 
-void QuadMesh::ComputeNormals() const
-{
-  int currentQuad = 0;
+Vector3 QuadMesh::intersectsRay(Ray r) const {
+  //from wikipedia https://en.wikipedia.org/wiki/Line%E2%80%93plane_intersection
+  float bot = r.dir.DotProduct(normal);
+  if (bot == 0) return Vector3::Sentinel();
+  Vector3 p0 = origin;
+  float top = (p0 - r.origin).DotProduct(normal);
+  float d = top / bot;
+  Vector3 intersectionPt = (r.origin + d * r.dir);
 
-  for (int j = 0; j< this->maxMeshSize; j++)
-  {
-    for (int k = 0; k< this->maxMeshSize; k++)
-    {
-      Vector3 n0, n1, n2, n3, e0, e1, e2, e3, ne0, ne1, ne2, ne3;
 
-      e0 = vertices[quads[currentQuad * 4 + 1]] - vertices[quads[currentQuad * 4 + 0]];
-      e1 = vertices[quads[currentQuad * 4 + 2]] - vertices[quads[currentQuad * 4 + 1]];
-      e2 = vertices[quads[currentQuad * 4 + 3]] - vertices[quads[currentQuad * 4 + 2]];
-      e3 = vertices[quads[currentQuad * 4 + 0]] - vertices[quads[currentQuad * 4 + 3]];
+  Vector3 localPt = intersectionPt - origin;
 
-      e0.Normalize();
-      e1.Normalize();
-      e2.Normalize();
-      e3.Normalize();
+  float projW = width.DotProduct(localPt) / width.GetLength();
+  if (projW < 0 || projW > width.GetLength()) return Vector3::Sentinel();
 
-      normals[quads[currentQuad * 4 + 0]] += e0.CrossProduct(-e3).Normalized();
-      normals[quads[currentQuad * 4 + 1]] += e1.CrossProduct(-e0).Normalized();
-      normals[quads[currentQuad * 4 + 2]] += e2.CrossProduct(-e1).Normalized();
-      normals[quads[currentQuad * 4 + 3]] += e3.CrossProduct(-e2).Normalized();
+  float projH = length.DotProduct(localPt) / length.GetLength();
+  if (projH < 0 || projH > length.GetLength()) return Vector3::Sentinel();
+  
+  return intersectionPt;
 
-      normals[quads[currentQuad*4+0]].Normalize();
-      normals[quads[currentQuad*4+1]].Normalize();
-      normals[quads[currentQuad*4+2]].Normalize();
-      normals[quads[currentQuad*4+3]].Normalize();
-
-      currentQuad++;
-    }
-  }
 }

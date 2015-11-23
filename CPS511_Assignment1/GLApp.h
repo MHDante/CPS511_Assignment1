@@ -4,15 +4,9 @@
 #include <gl/gl.h>
 #include <gl/glu.h>
 #include <gl/glut.h>
-#include "Vector3.h"
+#include "GLUtils.h"
 
 class Camera;
-
-struct Line
-{
-  Vector3 to;
-  Vector3 from;
-};
 
 class GLApp {
 public:

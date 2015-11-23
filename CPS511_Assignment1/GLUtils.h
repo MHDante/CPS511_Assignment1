@@ -1,3 +1,42 @@
+
+#ifndef VECTOR3D_H
+#define VECTOR3D_H
+#include <gl/gl.h>
+#include <string>
+
+#define DEG2RAD (3.14159265358979323846 / 180)
+
+struct Vector4 {
+  float x; float y; float z;  float w;
+  Vector4() :x(0), y(0), z(0), w(0) {};
+  Vector4(float x, float y, float z, float w) :x(x), y(y), z(z), w(w) {};
+
+  operator float* () const { return (float*) this; }
+  operator const float* () const { return (const float*) this; }
+};
+
+
+struct Material {
+
+  Vector4 ambient;
+  Vector4 specular;
+  Vector4 diffuse;
+  GLfloat shininess;
+
+  Material(Vector4 ambient_, Vector4 specular_,  Vector4 diffuse_,  GLfloat shininess_):
+    ambient(ambient_), specular(specular_), diffuse(diffuse_), shininess(shininess_) {}
+
+  Material() : shininess(0) {}
+
+  void glApply() const {
+    glMaterialfv(GL_FRONT, GL_AMBIENT, ambient);
+    glMaterialfv(GL_FRONT, GL_SPECULAR, specular);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse);
+    glMaterialfv(GL_FRONT, GL_SHININESS, &shininess);
+  }
+};
+
+
 //////////////////////////////////////////////////////////////////////////////////////////
 //	VECTOR3D.h
 //	Class declaration for a 3d vector
@@ -13,21 +52,6 @@
 //	http://www.paulsprojects.net/NewBSDLicense.txt)
 //////////////////////////////////////////////////////////////////////////////////////////	
 
-#ifndef VECTOR3D_H
-#define VECTOR3D_H
-#include <gl/gl.h>
-#include <string>
-
-
-struct Vector4 {
-  float x; float y; float z;  float w;
-  Vector4() :x(0), y(0), z(0), w(0) {};
-  Vector4(float _x, float _y, float _z, float _w) :x(_x), y(_y), z(_z), w(_w) {};
-
-  operator float* () const { return (float*) this; }
-  operator const float* () const { return (const float*) this; }
-};
-
 class Vector3
 {
 public:
@@ -38,8 +62,8 @@ public:
 	Vector3(float newX, float newY, float newZ)	:	x(newX), y(newY), z(newZ)
 	{}
 
-	Vector3(const float * rhs)	:	x(*rhs), y(*(rhs+1)), z(*(rhs+2))
-	{}
+  explicit Vector3(const float * rhs) : x(*rhs), y(*(rhs + 1)), z(*(rhs + 2))
+  {}
 
 	Vector3(const Vector3 & rhs)	:	x(rhs.x), y(rhs.y), z(rhs.z)
 	{}
@@ -48,7 +72,8 @@ public:
 
 	void Set(float newX, float newY, float newZ)
 	{	x=newX;	y=newY;	z=newZ;	}
-	
+	void Set(Vector3 o)
+	{	x=o.x;	y=o.y;	z=o.z;	}
 	//Accessors kept for compatibility
 	void SetX(float newX) {x = newX;}
 	void SetY(float newY) {y = newY;}
@@ -62,7 +87,13 @@ public:
 	{	x=y=z=0.0f;	}
 	void LoadOne(void)
 	{	x=y=z=1.0f;	}
-	
+
+  Vector3 ElementWiseProduct(Vector3 o) const {
+    return Vector3(x*o.x, y *o.y, z*o.z);
+	}
+
+  static Vector3 Sentinel() { return Vector3(NAN, NAN, NAN); }
+
 	//vector algebra
 	Vector3 CrossProduct(const Vector3 & rhs) const
 	{	return Vector3(y*rhs.z - z*rhs.y, z*rhs.x - x*rhs.z, x*rhs.y - y*rhs.x);	}
@@ -96,13 +127,20 @@ public:
 	//rotations
 	void RotateX(double angle);
 	Vector3 GetRotatedX(double angle) const;
-	void RotateY(double angle);
+	void RotateY(double angle) {
+    float cn = cos(angle*DEG2RAD);
+    float sn = sin(angle*DEG2RAD);
+    auto tempx = x * cn - z * sn;
+    auto tempz = z * cn + x * sn;
+    x = tempx;
+    z = tempz;
+	};
 	Vector3 GetRotatedY(double angle) const {
 
-    return Vector3(
-      (x / 2) * cos(angle) - (z / 2) * sin(angle),
-      y,
-      (z / 2) * cos(angle) + (x / 2) * sin(angle));
+    auto x = Vector3(*this);
+    x.RotateY(angle);
+    return x;
+
 	};
 	void RotateZ(double angle);
 	Vector3 GetRotatedZ(double angle) const;
@@ -118,7 +156,7 @@ public:
 	{	return (*this)*(1.0f-factor) + v2*factor;	}
 
 	Vector3 QuadraticInterpolate(const Vector3 & v2, const Vector3 & v3, float factor) const
-	{	return (*this)*(1.0f-factor)*(1.0f-factor) + 2*v2*factor*(1.0f-factor) + v3*factor*factor;}
+	{	return (*this)*(1.0f-factor)*(1.0f-factor) + v2*(2*factor*(1.0f-factor)) + v3*factor*factor;}
 
 
 	//overloaded operators
@@ -136,8 +174,12 @@ public:
 	{	return (rhs==0.0f) ? Vector3(0.0f, 0.0f, 0.0f) : Vector3(x / rhs, y / rhs, z / rhs);	}
 
 	//multiply by a float, eg 3*v
-	friend Vector3 operator*(float scaleFactor, const Vector3 & rhs);
-
+  friend Vector3 operator*(float scaleFactor, const Vector3 & rhs) {
+    return rhs * scaleFactor;
+  }
+  friend Vector3 operator/(float s, const Vector3 & rhs) {
+    return Vector3(s / rhs.x, s / rhs.y, s / rhs.z);
+  }
 	//Add, subtract etc, saving the construction of a temporary
 	void Add(const Vector3 & v2, Vector3 & result) const
 	{
@@ -183,8 +225,7 @@ public:
 	operator float* () const {return (float*) this;}
 	operator const float* () const {return (const float*) this;}
 
-  //operator Vector4 () const { return Vector4(x,y,z,0); }
-
+  bool isValid() const { return !(isnan(x)||isnan(y)||isnan(z)); }
   std::string toString() const
   {
     return ("(" + std::to_string(x) + "," + std::to_string(y) + "," + std::to_string(z)+")");
@@ -195,5 +236,41 @@ public:
 	float z;
 
 };
+//Why do I keep Three of these? 
 
+struct Ray {
+  Vector3 origin, dir;
+  Ray(Vector3 origin, Vector3 dir) :origin(origin), dir(dir) {};
+  Ray() :origin(Vector3()), dir(Vector3()) {};
+  Vector3 ptAt(float dist) const {
+    return origin + dir * dist;
+  }
+};
+
+struct Line
+{
+  Vector3 to,from;
+  Vector4 color = Vector4(0,0,1,1);
+  Line(Vector3 to, Vector3 from) :to(to), from(from) {}
+
+  void Draw() const {
+    glDisable(GL_LIGHTING);
+    glColor3f(color.x, color.y, color.z);
+    glBegin(GL_LINES);
+
+    glVertex3f(from.x, from.y, from.z);
+    glVertex3f(to.x, to.y, to.z);
+
+    glEnd();
+    glEnable(GL_LIGHTING);
+  }
+  Line() :to(Vector3()), from(Vector3()) {};
+};
+
+struct BBox
+{
+  Vector3 min, max;
+  BBox(Vector3 min, Vector3 max) { this->min = min; this->max = max; };
+  BBox() { this->min = Vector3(); this->max = Vector3(); };
+};
 #endif	//VECTOR3D_H

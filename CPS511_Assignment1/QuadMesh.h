@@ -1,35 +1,25 @@
 #ifndef QUADMESH
 #define QUADMESH
+// ReSharper disable once CppUnusedIncludeDirective
 #include <windows.h>
 #include <gl/gl.h>
-#include <math.h>
-#include <utility>
-#include <vector>
-#include "Vector3.h"
+#include "GLUtils.h"
 
-class QuadMesh
-{
-private:
+class QuadMesh{
 
-  int maxMeshSize;
-  int minMeshSize;
+  Vector3 origin, length, width;
   int numVertices;
   Vector3 *vertices;
-  Vector3 *normals;
   int numQuads;
   GLuint *quads;
-  
+
 public:
-  Vector4 mat_ambient;
-  Vector4 mat_specular;
-  Vector4 mat_diffuse;
-  GLfloat mat_shininess;
+  Vector3 normal;
+  Material material;
 
-  explicit QuadMesh(int maxMeshSize = 40);
+  explicit QuadMesh(int meshSize, Vector3 origin, Vector3 dir1, Vector3 dir2);
   ~QuadMesh();
-
-  bool InitMesh(int meshSize, Vector3 origin, double meshLength, double meshWidth, Vector3 dir1, Vector3 dir2);
-  void DrawMesh(int meshSize) const;
-  void ComputeNormals() const;
+  void DrawMesh(Material* mat = nullptr) const;
+  Vector3 intersectsRay(Ray r)const;
 };
 #endif

@@ -50,7 +50,7 @@
     <ClInclude Include="Modeller.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="Vector3.h">
+    <ClInclude Include="GLUtils.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

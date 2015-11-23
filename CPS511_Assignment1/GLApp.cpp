@@ -21,7 +21,7 @@ void GLApp::init(int argc, char **argv)
   glutDisplayFunc([]() {instance__->display(); });
   glutReshapeFunc([](int w, int h) {instance__->reshape(w, h); });
   glutMouseFunc([](int b, int i, int x, int y) {instance__->mouse(b, i, x, y); });
-  glutMotionFunc([](int x, int y) {instance__->mouseMotionHandler(x, y); });
+  glutPassiveMotionFunc([](int x, int y) {instance__->mouseMotionHandler(x, y); });
   glutKeyboardFunc([](unsigned char k, int x, int y) {instance__->keyboard(k, x, y); });
   glutSpecialFunc([](int k, int x, int y) {instance__->functionKeys(k, x, y); });
 

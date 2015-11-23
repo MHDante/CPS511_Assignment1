@@ -22,13 +22,12 @@ Camera::Camera(GLApp* gl_app) {
     gluPerspective(fovY, aspect, nearZ, farZ);
   }
 
-  Vector3 Camera::ScreenToWorldDir(int x, int y) const
+  Ray Camera::ScreenToWorldRay(int x, int y) const
   {
-    auto deg2Rad = (M_PI / 180);
     y = glApp->ScreenHeight -y; //Opengl...
     float xRatio = (glApp->ScreenWidth / 2.0);
     float yRatio = (glApp->ScreenHeight / 2.0);
-    float zRatio = tan(fovY * deg2Rad);
+    float zRatio = tan(fovY * DEG2RAD);
     Vector3 eyeDir = Vector3(x / xRatio, y/yRatio, zRatio);
     eyeDir.x *= aspect;
     eyeDir -= Vector3(1, 1, 0);
@@ -49,7 +48,5 @@ Camera::Camera(GLApp* gl_app) {
       eyeDir.x*rightVector.z + eyeDir.y*upVector.z + eyeDir.z*fwdVector.z
       );
 
-    auto vector3 = dir2;
-    std::cout << vector3.toString() << std::endl;
-    return vector3;
+    return Ray(pos, dir2);
   }

@@ -1,8 +1,8 @@
 #ifndef MODELLER
 #define MODELLER
 
-#include "QuadMesh.h"
 #include <windows.h>
+#include "QuadMesh.h"
 #include <gl/gl.h>
 #include <gl/glu.h>
 #include <gl/glut.h>
@@ -11,7 +11,7 @@
 #include <algorithm>
 #include <vector>
 #include <list>
-#include "Vector3.h"
+#include "GLUtils.h"
 #include "CubeMesh.h"
 #include "GLApp.h"
 
@@ -40,6 +40,6 @@ public:
   QuadMesh *wallMeshes[3];
   BBox *roomBox;
   int meshSize = 16;
-  std::vector<Line*> lines;
+  std::vector<Line> lines;
 };
 #endif

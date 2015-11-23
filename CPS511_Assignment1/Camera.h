@@ -6,7 +6,7 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include <vector>
-#include "Vector3.h"
+#include "GLUtils.h"
 
 class GLApp;
 
@@ -24,6 +24,6 @@ public:
   Camera::Camera(GLApp* gl_app);
  void display() const;
   void perspective() const;
-  Vector3 ScreenToWorldDir(int x, int y) const;
+  Ray ScreenToWorldRay(int x, int y) const;
 };
 #endif

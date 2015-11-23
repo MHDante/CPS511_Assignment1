@@ -1,5 +1,6 @@
 #include "Modeller.h"
 #include "Camera.h"
+#include <iostream>
 
 /*******************************************************************
 Scene Modelling Program
@@ -12,41 +13,35 @@ Modeller::Modeller()
 
 }
 
-void Modeller:: setUpScene(){
+void Modeller::setUpScene() {
   // Set up meshes
   Vector3 origin = Vector3(-8.0f, 0.0f, 8.0f);
-  Vector3 dir1v = Vector3(1.0f, 0.0f, 0.0f);
-  Vector3 dir2v = Vector3(0.0f, 0.0f, -1.0f);
+  Vector3 dir1v = Vector3(1.0f, 0.0f, 0.0f) * 16;
+  Vector3 dir2v = Vector3(0.0f, 0.0f, -1.0f) * 16;
   Vector4 diffuse = Vector4(0.9f, 0.5f, 0.0f, 1);
-  floorMesh = new QuadMesh(meshSize);
-  floorMesh->InitMesh(meshSize, origin, 16.0, 16.0, dir1v, dir2v);
-  floorMesh->mat_diffuse = diffuse;
+  floorMesh = new QuadMesh(meshSize, origin, dir1v, dir2v);
+  floorMesh->material.diffuse = diffuse;
 
   diffuse = Vector4(0, 1, 0.0f, 4);
   origin = Vector3(-8.0f, 0.0f, 8.0f);
-  dir1v = Vector3(0.0f, 0.0f, -1.0f);
-  dir2v = Vector3(0.0f, .25f, 0.0f);
-  wallMeshes[0] = new QuadMesh(meshSize);
-  wallMeshes[0]->InitMesh(meshSize, origin, 16.0, 16.0, dir1v, dir2v);
-  wallMeshes[0]->mat_diffuse = diffuse;
-  
-  origin = Vector3(8.0f, 0.0f, -8.0f);
-  dir1v = Vector3(0.0f, 0.0f, 1.0f);
-  dir2v = Vector3(0.0f, .25f, 0.0f);
-  wallMeshes[1] = new QuadMesh(meshSize);
-  wallMeshes[1]->InitMesh(meshSize, origin, 16.0, 16.0, dir1v, dir2v);
-  wallMeshes[1]->mat_diffuse = diffuse;
-  
-  origin = Vector3(-8.0f, 0.0f, -8.0f);
-  dir1v = Vector3(1.0f, 0.0f, 0.0f);
-  dir2v = Vector3(0.0f, .25f, 0.0f);
-  wallMeshes[2] = new QuadMesh(meshSize);
-  wallMeshes[2]->InitMesh(meshSize, origin, 16.0, 16.0, dir1v, dir2v);
-  wallMeshes[2]->mat_diffuse = diffuse;
+  dir1v = Vector3(0.0f, 0.0f, -1.0f) * 16;
+  dir2v = Vector3(0.0f, .25f, 0.0f) * 16;
+  wallMeshes[0] = new QuadMesh(meshSize, origin, dir1v, dir2v);
+  wallMeshes[0]->material.diffuse = diffuse;
 
-  roomBox = new BBox;
-  roomBox->min.Set(-8.0f, 0.0, -8.0);
-  roomBox->max.Set(8.0f, 6.0, 8.0);
+  origin = Vector3(8.0f, 0.0f, -8.0f);
+  dir1v = Vector3(0.0f, 0.0f, 1.0f) * 16;
+  dir2v = Vector3(0.0f, .25f, 0.0f) * 16;
+  wallMeshes[1] = new QuadMesh(meshSize, origin, dir1v, dir2v);
+  wallMeshes[1]->material.diffuse = diffuse;
+
+  origin = Vector3(-8.0f, 0.0f, -8.0f);
+  dir1v = Vector3(1.0f, 0.0f, 0.0f) * 16;
+  dir2v = Vector3(0.0f, .25f, 0.0f) * 16;
+  wallMeshes[2] = new QuadMesh(meshSize, origin, dir1v, dir2v);
+  wallMeshes[2]->material.diffuse = diffuse;
+
+  roomBox = new BBox(Vector3(-8.0f, -6, -8.0), Vector3(8.0f, 6.0, 8.0));
 
   mainCamera->pos = Vector3(0.0, 6.0, 22.0);
   mainCamera->target = Vector3(0.0, 0.0, 0.0);
@@ -55,8 +50,8 @@ void Modeller:: setUpScene(){
   mainCamera->aspect = 1.0;
   mainCamera->nearZ = 0.2;
   mainCamera->farZ = 40.0;
-
 }
+
 
 
   void Modeller::display(void)
@@ -66,26 +61,19 @@ void Modeller:: setUpScene(){
     // Set up the camera
     mainCamera->display();
     // Draw all cubes (see CubeMesh.h)
-    for (auto c : cubes) {
+    for (auto& c : cubes) {
       c->drawCube();
     }
     // Draw floor and wall meshes
-    floorMesh->DrawMesh(meshSize);
-    for (auto w : wallMeshes) {
-      w->DrawMesh(meshSize);
+    //floorMesh->DrawMesh();
+    for (auto& w : wallMeshes) {
+      w->DrawMesh();
     }
-    wallMeshes[0]->DrawMesh(meshSize);
+    wallMeshes[0]->DrawMesh();
 
-    glDisable(GL_LIGHTING);
-    glColor3f(1, 0, 0);
-
-    glBegin(GL_LINES);
-    for (auto l : lines) {
-      glVertex3f(l->from.x, l->from.y, l->from.z);
-      glVertex3f(l->to.x, l->to.y, l->to.z);
+    for (auto& l : lines) {
+      l.Draw();
     }
-    glEnd();
-    glEnable(GL_LIGHTING);
     glutSwapBuffers();
   }
 
@@ -102,15 +90,7 @@ void Modeller:: setUpScene(){
       if (state == GLUT_DOWN)
       {
 
-        Vector3 dir2 = mainCamera->ScreenToWorldDir(x, y);
-
-        for (int i = 10; i < 44; i++){
-          auto l = new Line();
-          l->from = Vector3();// mainCamera->pos;
-          l->to = mainCamera->pos+ dir2*i;
-          lines.push_back(l);
-        }
-        return;
+        
 
       }
 
@@ -126,20 +106,48 @@ void Modeller:: setUpScene(){
     }
     glutPostRedisplay();
   }
-
+  int counter;
   // Mouse motion callback - use only if you want to 
   void Modeller::mouseMotionHandler(int xMouse, int yMouse)
   {
+    counter = counter++ % 2;
+    if (counter != 1) return;
+    Ray ray = mainCamera->ScreenToWorldRay(xMouse, yMouse);
+
+    for (auto& c : selectedCubes) {
+      Vector3 hit = c->Intersects(&ray);
+      lines.clear();
+
+      if (hit.isValid()) {
+        lines.push_back(Line(Vector3(8, 12, 16), hit));
+        lines.push_back(Line(Vector3(-8, 12, 16), hit));
+        lines.push_back(Line(Vector3(8, -6, 16), hit));
+        lines.push_back(Line(Vector3(-8, -6, 16), hit));
+
+        auto c = new CubeMesh();
+        c->center = hit;
+        c->dim.LoadOne();
+        c->dim *= 0.2;
+        cubes.push_back(c);
+
+      }
+
+
+      Line l = Line(ray.origin, ray.origin + ray.dir * 40);
+      l.color = Vector4(.8, 0, .8, 1);
+      lines.push_back(l);
+    }
+
     if (currentButton == GLUT_LEFT_BUTTON)
     {
-      ;
+      ; 
     }
     glutPostRedisplay();
   }
 
   void Modeller::selectCube(CubeMesh* cube) {
     if (CubeMesh::singleSelecting) {
-      for (auto c : selectedCubes) c->selected = false;
+      for (auto& c : selectedCubes) c->selected = false;
       selectedCubes.clear();
     }
     if (selector)selector->hovered = false;
@@ -157,7 +165,7 @@ void Modeller:: setUpScene(){
     float bestDist = 100;
     float altDist = -100;
     int topPointer = 0;
-    for (auto c : cubes) {
+    for (auto& c : cubes) {
       if (c == selector) continue;
       float dist = 0;
       float dist2 = 0;
@@ -229,10 +237,12 @@ void Modeller:: setUpScene(){
       CubeMesh::singleSelecting = false;
       break;
     case '-':
-      for (auto c : selectedCubes) c->selected = false;
+      for (auto& c : selectedCubes) c->selected = false;
       selectedCubes.clear();
+      lines.clear();
       break;
     case 27: exit(0); break;
+    case 127: cubes.clear(); break;
     case ' ': //spacebar
       if (currentAction == MULTIPLESELECT && selector != nullptr) {
         if (!selector->selected)selectCube(selector);
@@ -251,7 +261,7 @@ void Modeller:: setUpScene(){
     switch (key) {
     case GLUT_KEY_F1: {
       auto c = new CubeMesh();
-      c->center.SetY(1);
+      //c->center.SetY(1);
       cubes.push_back(c);
       selectCube(c);
       break;
@@ -266,11 +276,11 @@ void Modeller:: setUpScene(){
       bool clear = true;
       attempt:
       switch (currentAction) {
-      case TRANSLATE: for (auto c : selectedCubes) clear &= c->translate(diff, roomBox); break;
-      case SCALE:     for (auto c : selectedCubes) clear &= c->scale(diff, roomBox); break;
-      case ROTATE:    for (auto c : selectedCubes) clear &= c->rotate(diff, roomBox); break;
-      case EXTRUDE:   for (auto c : selectedCubes) clear &= c->extrude(diff, roomBox); break;
-      case RAISE:     for (auto c : selectedCubes) clear &= c->raise(diff, roomBox); break;
+      case TRANSLATE: for (auto& c : selectedCubes) clear &= c->translate(diff, roomBox); break;
+      case SCALE:     for (auto& c : selectedCubes) clear &= c->scale(diff, roomBox); break;
+      case ROTATE:    for (auto& c : selectedCubes) clear &= c->rotate(diff, roomBox); break;
+      case EXTRUDE:   for (auto& c : selectedCubes) clear &= c->extrude(diff, roomBox); break;
+      case RAISE:     for (auto& c : selectedCubes) clear &= c->raise(diff, roomBox); break;
       case SELECT:          select(diff); break;
       case MULTIPLESELECT:  select(diff); break;
       }

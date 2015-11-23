@@ -135,7 +135,7 @@
     <ClInclude Include="GLApp.h" />
     <ClInclude Include="Modeller.h" />
     <ClInclude Include="QuadMesh.h" />
-    <ClInclude Include="Vector3.h" />
+    <ClInclude Include="GLUtils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
