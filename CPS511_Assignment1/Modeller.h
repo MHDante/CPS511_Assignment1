@@ -32,8 +32,11 @@ public:
   void functionKeys(int key, int x, int y) override;
   void selectCube(CubeMesh* cube);
   void select(Vector3 diff);
+  void UpdateConsole() override;
 
   enum Action { TRANSLATE, ROTATE, SCALE, EXTRUDE, RAISE, SELECT, MULTIPLESELECT };
+  std::string ActionNames[7] =  { "TRANSLATE","ROTATE","SCALE","EXTRUDE","RAISE","SELECT","MULTIPLESELECT"};
+
   enum Action currentAction = TRANSLATE;
 
   QuadMesh *floorMesh = nullptr;

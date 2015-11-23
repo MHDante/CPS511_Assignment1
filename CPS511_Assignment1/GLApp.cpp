@@ -1,5 +1,6 @@
 #include "GLApp.h"
 #include "Camera.h"
+#include <thread>
 
 GLApp* instance__;
 GLApp::GLApp()
@@ -24,6 +25,8 @@ void GLApp::init(int argc, char **argv)
   glutPassiveMotionFunc([](int x, int y) {instance__->mouseMotionHandler(x, y); });
   glutKeyboardFunc([](unsigned char k, int x, int y) {instance__->keyboard(k, x, y); });
   glutSpecialFunc([](int k, int x, int y) {instance__->functionKeys(k, x, y); });
+
+  auto t1 = std::thread([]() {instance__->UpdateConsole(); });
 
   // Set up viewport, projection, then change to modelview matrix mode - 
   // display function will then set up camera and modeling transforms

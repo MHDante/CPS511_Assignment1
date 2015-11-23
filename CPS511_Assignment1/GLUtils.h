@@ -3,8 +3,16 @@
 #define VECTOR3D_H
 #include <gl/gl.h>
 #include <string>
+#include <sstream>
+#include <iomanip>
 
 #define DEG2RAD (3.14159265358979323846 / 180)
+
+inline std::string floatToSmallString(float f, int precision = 2) {
+  std::stringstream ss;
+  ss << std::fixed << std::setprecision(precision) << f;
+  return ss.str();
+}
 
 struct Vector4 {
   float x; float y; float z;  float w;
@@ -228,7 +236,10 @@ public:
   bool isValid() const { return !(isnan(x)||isnan(y)||isnan(z)); }
   std::string toString() const
   {
-    return ("(" + std::to_string(x) + "," + std::to_string(y) + "," + std::to_string(z)+")");
+
+
+
+    return ("(" + floatToSmallString(x) + "," + floatToSmallString(y) + "," + floatToSmallString(z) +")");
 	}
   //member variables
 	float x;
@@ -273,4 +284,6 @@ struct BBox
   BBox(Vector3 min, Vector3 max) { this->min = min; this->max = max; };
   BBox() { this->min = Vector3(); this->max = Vector3(); };
 };
+
+
 #endif	//VECTOR3D_H

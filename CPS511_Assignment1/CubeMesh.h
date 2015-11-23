@@ -47,7 +47,7 @@ public:
   bool rotate(Vector3 diff, BBox* bounds);
   bool extrude(Vector3 diff, BBox* bounds);
   bool raise(Vector3 diff, BBox* bounds);
-  Vector3 Intersects(Ray* ray) const;
+  Vector3 Intersects(Ray ray) const;
   static bool singleSelecting;
 };
 #endif

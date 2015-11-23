@@ -1,6 +1,7 @@
 #include "Modeller.h"
 #include "Camera.h"
 #include <iostream>
+#include <thread>
 
 /*******************************************************************
 Scene Modelling Program
@@ -41,7 +42,7 @@ void Modeller::setUpScene() {
   wallMeshes[2] = new QuadMesh(meshSize, origin, dir1v, dir2v);
   wallMeshes[2]->material.diffuse = diffuse;
 
-  roomBox = new BBox(Vector3(-8.0f, -6, -8.0), Vector3(8.0f, 6.0, 8.0));
+  roomBox = new BBox(Vector3(-8.0f, 0, -8.0), Vector3(8.0f, 6.0, 8.0));
 
   mainCamera->pos = Vector3(0.0, 6.0, 22.0);
   mainCamera->target = Vector3(0.0, 0.0, 0.0);
@@ -50,12 +51,12 @@ void Modeller::setUpScene() {
   mainCamera->aspect = 1.0;
   mainCamera->nearZ = 0.2;
   mainCamera->farZ = 40.0;
+
 }
-
-
 
   void Modeller::display(void)
   {
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
     // Set up the camera
@@ -65,7 +66,7 @@ void Modeller::setUpScene() {
       c->drawCube();
     }
     // Draw floor and wall meshes
-    //floorMesh->DrawMesh();
+    floorMesh->DrawMesh();
     for (auto& w : wallMeshes) {
       w->DrawMesh();
     }
@@ -80,7 +81,7 @@ void Modeller::setUpScene() {
   Vector3 pos = Vector3(0, 0, 0);
 
   // Mouse button callback - use only if you want to 
-  void Modeller::mouse(int button, int state, int x, int y)
+  void Modeller::mouse(int button, int state, int xMouse, int yMouse)
   {
     currentButton = button;
 
@@ -89,8 +90,18 @@ void Modeller::setUpScene() {
     case GLUT_LEFT_BUTTON:
       if (state == GLUT_DOWN)
       {
-
         
+
+        if (currentAction == SELECT || currentAction == MULTIPLESELECT) {
+          Ray ray = mainCamera->ScreenToWorldRay(xMouse, yMouse);
+          lines.clear();
+          for (auto& c : cubes) {
+            Vector3 hit = c->Intersects(ray);
+            if (hit.isValid()) {
+              selectCube(c);
+            }
+          }
+        }
 
       }
 
@@ -106,53 +117,30 @@ void Modeller::setUpScene() {
     }
     glutPostRedisplay();
   }
-  int counter;
+  
   // Mouse motion callback - use only if you want to 
   void Modeller::mouseMotionHandler(int xMouse, int yMouse)
   {
-    counter = counter++ % 2;
-    if (counter != 1) return;
-    Ray ray = mainCamera->ScreenToWorldRay(xMouse, yMouse);
-
-    for (auto& c : selectedCubes) {
-      Vector3 hit = c->Intersects(&ray);
-      lines.clear();
-
-      if (hit.isValid()) {
-        lines.push_back(Line(Vector3(8, 12, 16), hit));
-        lines.push_back(Line(Vector3(-8, 12, 16), hit));
-        lines.push_back(Line(Vector3(8, -6, 16), hit));
-        lines.push_back(Line(Vector3(-8, -6, 16), hit));
-
-        auto c = new CubeMesh();
-        c->center = hit;
-        c->dim.LoadOne();
-        c->dim *= 0.2;
-        cubes.push_back(c);
-
-      }
-
-
-      Line l = Line(ray.origin, ray.origin + ray.dir * 40);
-      l.color = Vector4(.8, 0, .8, 1);
-      lines.push_back(l);
-    }
-
     if (currentButton == GLUT_LEFT_BUTTON)
     {
       ; 
     }
     glutPostRedisplay();
   }
-
   void Modeller::selectCube(CubeMesh* cube) {
+
+    if (selector)selector->hovered = false;
+    cube->hovered = true;
     if (CubeMesh::singleSelecting) {
       for (auto& c : selectedCubes) c->selected = false;
       selectedCubes.clear();
+    } else if (cube->selected){
+      cube->selected = false;
+        selector = cube;
+        selectedCubes.erase(std::remove(selectedCubes.begin(), selectedCubes.end(), cube), selectedCubes.end());
+        return;
     }
-    if (selector)selector->hovered = false;
     cube->selected = true;
-    cube->hovered = true;
     selectedCubes.push_back(cube);
     selector = cube;
   }
@@ -163,60 +151,65 @@ void Modeller::setUpScene() {
     Vector3 center = (selector == nullptr) ? Vector3() : selector->center;
     CubeMesh* best = nullptr;
     float bestDist = 100;
-    float altDist = -100;
     int topPointer = 0;
     for (auto& c : cubes) {
       if (c == selector) continue;
       float dist = 0;
-      float dist2 = 0;
       if (diff.x == -1) {
         dist = center.x - c->center.x;
-        dist2 = center.z - c->center.z;
       }
       else if (diff.x == 1) {
         dist = c->center.x - center.x;
-        dist2 = c->center.z - center.z;
       }
       else if (diff.z == -1) {
-        dist2 = center.x - c->center.x;
         dist = center.z - c->center.z;
       }
       else if (diff.z == 1) {
-        dist2 = c->center.x - center.x;
         dist = c->center.z - center.z;
       }
 
       if (dist < 0)dist = 100 + dist;
-      //if (dist2 < 0)dist2 = 100 + dist;
 
       if (dist != 0) {
         if (dist < bestDist) {
           best = c; bestDist = dist;
-          altDist = dist2;
-        }
-        else if (dist == bestDist && dist2 < altDist) {
-          best = c; bestDist = dist;
-          altDist = dist2;
         }
       }
-      else if (dist2 > 0) {
-        best = c; bestDist = 0; altDist = dist2;
-      }
-      else if (dist2 == 0 && int(c) > topPointer && c < selector) {
-        best = c; bestDist = 0; altDist = dist2;
+    }
+    if (best != nullptr) {
+      if (currentAction == SELECT) selectCube(best);
+      else if (currentAction == MULTIPLESELECT) {
+        if (selector != nullptr) selector->hovered = false;
+        selector = best;
+        selector->hovered = true;
       }
     }
-
-    if (currentAction == SELECT) selectCube(best);
-    else if (currentAction == MULTIPLESELECT) {
-      if (selector != nullptr) selector->hovered = false;
-      selector = best;
-      selector->hovered = true;
-    }
-
 
   }
 
+
+  void Modeller::UpdateConsole() {
+    while (true) {
+      std::this_thread::sleep_for(std::chrono::milliseconds(500));
+      system("cls");
+      std::cout << "Curent mode: " + ActionNames[currentAction] << std::endl;
+      std::cout << "Press f1 to spawn a block." << std::endl;
+      std::cout << "Scale  : S | Translate   : T | Rotate   : R | Extrude : E   | Raise : H   |" << std::endl;
+      std::cout << "Select : C | MultiSelect : + | Deselect : - | Delete  : Del | Quit  : Esc |" << std::endl;
+
+      switch (currentAction) {
+      case TRANSLATE:       std::cout << "Left/Right: Translate lengthwise.    | Up/Down: Translate depthwise" << std::endl;              break;
+      case SCALE:           std::cout << "Left/Right: Scale lengthwise.        | Up/Down: Scale depthwise" << std::endl;                      break;
+      case ROTATE:          std::cout << "Left/Down = Rotate CounterClockwise. | Up/Right = Rotate Clockwise." << std::endl;           break;
+      case EXTRUDE:         std::cout << "Left/Down = Shrink vertically.       | Up/Right = Extrude vertically." << std::endl;               break;
+      case RAISE:           std::cout << "Left/Down = Lower.                   | Up/Right = Raise." << std::endl;                                        break;
+      case SELECT:          std::cout << "Use ArrowKeys or Click to select     |" << std::endl;                                            break;
+      case MULTIPLESELECT:  std::cout << "ArrowKeys/Mouse: Change pointer.     | Spacebar/click to Select/Deselect" << std::endl;    break;
+      }
+      if (selector == nullptr) std::cout << "CurrentBlock: No block selected." << std::endl;
+      if (selector != nullptr) std::cout << "CurrentBlock: Pos:" + selector->center.toString() + " Size:" + selector->dim.toString() + " Rotation:" + floatToSmallString(selector->angle) << std::endl;
+    }
+  }
 
   /* Handles input from the keyboard, non-arrow keys */
   void Modeller::keyboard(unsigned char key, int x, int y)
@@ -242,14 +235,22 @@ void Modeller::setUpScene() {
       lines.clear();
       break;
     case 27: exit(0); break;
-    case 127: cubes.clear(); break;
+    case 127: 
+      bool resetSelector;
+      for (auto& c : selectedCubes) {
+        cubes.erase(std::remove(cubes.begin(), cubes.end(), c), cubes.end());
+        delete c;
+        if (c == selector)
+        {
+          selector = nullptr;
+          currentAction = CubeMesh::singleSelecting ? SELECT : MULTIPLESELECT;
+        }
+      }
+      selectedCubes.clear();
+      break;
     case ' ': //spacebar
       if (currentAction == MULTIPLESELECT && selector != nullptr) {
-        if (!selector->selected)selectCube(selector);
-        else {
-          selector->selected = false;
-          selectedCubes.erase(std::remove(selectedCubes.begin(), selectedCubes.end(), selector), selectedCubes.end());
-        }
+        selectCube(selector);
       }
     }
     glutPostRedisplay();
@@ -261,7 +262,7 @@ void Modeller::setUpScene() {
     switch (key) {
     case GLUT_KEY_F1: {
       auto c = new CubeMesh();
-      //c->center.SetY(1);
+      c->center.SetY(1);
       cubes.push_back(c);
       selectCube(c);
       break;

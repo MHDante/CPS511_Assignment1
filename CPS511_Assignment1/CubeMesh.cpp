@@ -123,30 +123,33 @@ bool CubeMesh::raise(Vector3 diff, BBox* bounds)
   return isWithin(bounds);
 }
 
-Vector3 CubeMesh::Intersects(Ray* ray) const {
+Vector3 CubeMesh::Intersects(Ray ray) const {
   
 
   if (angle != 0) {
-    auto relorigin = ray->origin - center;
-    auto reltarget = (ray->origin + ray->dir) - center;
+    auto relorigin = ray.origin - center;
+    auto reltarget = (ray.origin + ray.dir) - center;
     relorigin.RotateY(angle);
     reltarget.RotateY(angle);
-    ray->origin = center + relorigin;
-    ray->dir = (center + reltarget - ray->origin);
+    ray.origin = center + relorigin;
+    ray.dir = (center + reltarget - ray.origin);
   }
-  ray->origin -= center;
+  ray.origin -= center;
 
-  ray->origin.z /= dim.z / 2;
-  ray->origin.x /= dim.x / 2;
-  ray->dir.z /= dim.z/2;
-  ray->dir.x /= dim.x/2;
+  ray.origin.z /= dim.z / 2;
+  ray.origin.y /= dim.y / 2;
+  ray.origin.x /= dim.x / 2;
+  ray.dir.z /= dim.z/2;
+  ray.dir.y /= dim.y / 2;
+  ray.dir.x /= dim.x/2;
 
   Vector3 ret = Vector3::Sentinel();
   for (auto& face : faces) {
-    auto hit = face.intersectsRay(*ray);
+    auto hit = face.intersectsRay(ray);
     if (hit.isValid()) {
       hit.z *= dim.z/2;
-      hit.x *= dim.x/2;
+      hit.x *= dim.x / 2;
+      hit.y *= dim.y/2;
       hit.RotateY(-angle);
 
       hit += center;
