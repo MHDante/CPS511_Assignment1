@@ -65,7 +65,6 @@ void CubeMesh::drawSelector() const {
   gluCylinder(quadObj, 0, .5, 1, 10, 10);
   glTranslatef(0, 0, .5);
   gluCylinder(quadObj, .25, .25, 1, 10, 10);
-
   glPopMatrix();
 }
 

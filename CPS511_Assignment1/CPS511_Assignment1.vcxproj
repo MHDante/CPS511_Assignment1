@@ -126,17 +126,17 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Game.cpp" />
     <ClCompile Include="GLApp.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Modeller.cpp" />
     <ClCompile Include="QuadMesh.cpp" />
     <ClCompile Include="CubeMesh.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CubeMesh.h" />
+    <ClInclude Include="Game.h" />
     <ClInclude Include="GLApp.h" />
-    <ClInclude Include="Modeller.h" />
     <ClInclude Include="QuadMesh.h" />
     <ClInclude Include="GLUtils.h" />
   </ItemGroup>
