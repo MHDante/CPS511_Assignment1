@@ -30,7 +30,7 @@ class CubeMesh
 public:
 	Vector3 center;
 	Vector3 dim;
-	int angle;				// Angle around y-axis of cube coordinate system
+	Vector3 rotation;				// Angle around y-axis of cube coordinate system
 	bool selected;
   bool hovered;
   static Material material; // Material properties for drawing
@@ -45,6 +45,7 @@ public:
   bool translate(Vector3 diff, BBox* bounds);
   bool scale(Vector3 diff, BBox* bounds);
   bool rotate(Vector3 diff, BBox* bounds);
+  bool rotateEulers(Vector3 rot, BBox * bounds);
   bool extrude(Vector3 diff, BBox* bounds);
   bool raise(Vector3 diff, BBox* bounds);
   Vector3 Intersects(Ray ray) const;

@@ -24,7 +24,11 @@ void GLApp::init(int argc, char **argv)
   glutMouseFunc([](int b, int i, int x, int y) {instance__->mouse(b, i, x, y); });
   glutPassiveMotionFunc([](int x, int y) {instance__->mouseMotionHandler(x, y); });
   glutKeyboardFunc([](unsigned char k, int x, int y) {instance__->keyboard(k, x, y); });
+  glutKeyboardUpFunc([](unsigned char k, int x, int y) {instance__->keyboardRelease(k, x, y); });
   glutSpecialFunc([](int k, int x, int y) {instance__->functionKeys(k, x, y); });
+  
+
+  glutIdleFunc([]() { instance__->idleFunc(); });
 
   auto t1 = std::thread([]() {instance__->UpdateConsole(); });
 

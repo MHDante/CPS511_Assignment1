@@ -18,6 +18,8 @@ public:
   virtual void mouseMotionHandler(int xMouse, int yMouse) = 0;
   virtual void keyboard(unsigned char key, int x, int y) = 0;
   virtual void functionKeys(int key, int x, int y) = 0;
+  virtual void keyboardRelease(unsigned char key, int x, int y) = 0;
+  virtual void idleFunc() = 0;
   virtual void UpdateConsole() = 0;
   virtual void setUpScene() = 0;
 

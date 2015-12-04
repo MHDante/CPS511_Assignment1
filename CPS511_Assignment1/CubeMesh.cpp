@@ -10,7 +10,7 @@ CubeMesh::CubeMesh()
   
   selected = false;
   hovered = false;
-  angle = 0;
+  rotation.Set(0, 0, 0);
   center.Set(0, 0, 0);
   dim.Set(2.0f, 2.0f, 2.0f);
 }
@@ -24,10 +24,10 @@ BBox CubeMesh::getBBox() const
   //could be optimized by memoization
 
   Vector3 edgePoints[4] = {
-    (Vector3(-dim.x, 0,-dim.z)*.5).GetRotatedY(angle),
-    (Vector3(-dim.x, 0,dim.z )*.5).GetRotatedY(angle),
-    (Vector3(dim.x, 0,-dim.z )*.5).GetRotatedY(angle),
-    (Vector3(dim.x, 0,dim.z  )*.5).GetRotatedY(angle) };
+    (Vector3(-dim.x, 0,-dim.z)*.5).GetRotatedY(rotation.y),
+    (Vector3(-dim.x, 0,dim.z )*.5).GetRotatedY(rotation.y),
+    (Vector3(dim.x, 0,-dim.z )*.5).GetRotatedY(rotation.y),
+    (Vector3(dim.x, 0,dim.z  )*.5).GetRotatedY(rotation.y) };
 
   float maxX = FLT_MIN;
   float maxZ = FLT_MIN;
@@ -75,7 +75,7 @@ void CubeMesh::drawCube() const
   glPushAttrib(GL_LIGHTING_BIT);
   glTranslatef(center.x, center.y, center.z);
   if (hovered) drawSelector();
-  glRotatef(angle, 0, 1, 0);
+  glRotatef(rotation.y, 0, 1, 0);
   glScalef(dim.x/2, dim.y/2, dim.z/2);
   Material* matptr = selected ? &highlightMaterial : &material;
 
@@ -97,7 +97,7 @@ bool CubeMesh::scale(Vector3 diff, BBox* bounds)
 
   diff.x = diff.x == 1 ? 1.25f : diff.x == -1 ? 0.8f : 1;
   diff.z = diff.z == -1 ? 1.25f : diff.z == 1 ? 0.8f : 1;
-  if ((angle > 45 && angle < 135) || (angle > 225 && angle < 315)) diff = Vector3(diff.z, 0, diff.x);
+  if ((rotation.y > 45 && rotation.y < 135) || (rotation.y > 225 && rotation.y < 315)) diff = Vector3(diff.z, 0, diff.x);
   dim.SetX(dim.x * diff.x);
   dim.SetZ(dim.z * diff.z);
   return isWithin(bounds) && dim.x > 0.1 && dim.z > 0.1;
@@ -105,8 +105,15 @@ bool CubeMesh::scale(Vector3 diff, BBox* bounds)
 bool CubeMesh::rotate(Vector3 diff, BBox* bounds)
 {
   diff *= 5;
-  angle = int(angle + diff.x + diff.z) % 360;
+  rotation.y = int(rotation.y + diff.x + diff.z) % 360;
   return isWithin(bounds);
+}
+bool CubeMesh::rotateEulers(Vector3 rot, BBox* bounds)
+{
+	rotation.x = int(rotation.x + rot.x) % 360;
+	rotation.y = int(rotation.y + rot.y) % 360;
+	rotation.z = int(rotation.z + rot.z) % 360;
+	return isWithin(bounds);
 }
 bool CubeMesh::extrude(Vector3 diff, BBox* bounds)
 {
@@ -125,11 +132,11 @@ bool CubeMesh::raise(Vector3 diff, BBox* bounds)
 Vector3 CubeMesh::Intersects(Ray ray) const {
   
 
-  if (angle != 0) {
+  if (rotation.y != 0) {
     auto relorigin = ray.origin - center;
     auto reltarget = (ray.origin + ray.dir) - center;
-    relorigin.RotateY(angle);
-    reltarget.RotateY(angle);
+    relorigin.RotateY(rotation.y);
+    reltarget.RotateY(rotation.y);
     ray.origin = center + relorigin;
     ray.dir = (center + reltarget - ray.origin);
   }
@@ -149,7 +156,7 @@ Vector3 CubeMesh::Intersects(Ray ray) const {
       hit.z *= dim.z/2;
       hit.x *= dim.x / 2;
       hit.y *= dim.y/2;
-      hit.RotateY(-angle);
+      hit.RotateY(-rotation.y);
 
       hit += center;
       if(!ret.isValid() || hit.z > ret.z) 
