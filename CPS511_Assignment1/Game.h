@@ -16,13 +16,16 @@
 #include "GLApp.h"
 #include "Player.h"
 
+
 #include "Room.h"
 class Game : public GLApp
 {
 public:
 	// Cube Mesh Array variables and initialization
 	std::vector<CubeMesh*> cubes;
+	std::vector<Bullet*> bullets;
 	Player * player;
+	
 	Vector3 rightLeft, upDown;
 	int centerX;
 	int centerY;
