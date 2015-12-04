@@ -15,9 +15,11 @@
 // Vertex positions of a standard size cube (width 2), centered at the origin
 // of its own Model Coordinate System
 
+class Room;
+
 class CubeMesh
 {
-
+private:
   QuadMesh faces[6] = {
     QuadMesh(1, Vector3(-1, 1, -1), Vector3(0, 0, 2), Vector3(2, 0, 0)),
     QuadMesh(1, Vector3(1, -1, 1), Vector3(-2, 0, 0), Vector3(0, 0, -2)),
@@ -35,18 +37,17 @@ public:
   bool hovered;
   static Material material; // Material properties for drawing
   static Material highlightMaterial;	// Material properties if selected
-
+  Room* room;
   //Methods
-  CubeMesh();
-  bool isWithin(BBox* container) const;
+  CubeMesh(Room* room);
   void drawSelector() const;
   BBox getBBox() const;
   void drawCube() const;
-  bool translate(Vector3 diff, BBox* bounds);
-  bool scale(Vector3 diff, BBox* bounds);
-  bool rotate(Vector3 diff, BBox* bounds);
-  bool extrude(Vector3 diff, BBox* bounds);
-  bool raise(Vector3 diff, BBox* bounds);
+  bool translate(Vector3 diff);
+  bool scale(Vector3 diff);
+  bool rotate(Vector3 diff);
+  bool extrude(Vector3 diff);
+  bool raise(Vector3 diff);
   Vector3 Intersects(Ray ray) const;
   static bool singleSelecting;
 };

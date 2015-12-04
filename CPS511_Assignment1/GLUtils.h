@@ -1,6 +1,8 @@
 
 #ifndef VECTOR3D_H
 #define VECTOR3D_H
+
+#include <windows.h>
 #include <gl/gl.h>
 #include <string>
 #include <sstream>
@@ -278,11 +280,33 @@ struct Line
   Line() :to(Vector3()), from(Vector3()) {};
 };
 
-struct BBox
+class BBox
 {
+public:
   Vector3 min, max;
-  BBox(Vector3 min, Vector3 max) { this->min = min; this->max = max; };
+  BBox(Vector3 min, Vector3 max) { this->min = min; this->max = max; }
+
+  virtual bool Contains(BBox* box) const {
+    bool res = ((box->min.x >= min.x) &&
+                (box->min.y >= min.y) &&
+                (box->min.z >= min.z) &&
+                (box->max.x <= max.x) &&
+                (box->max.y <= max.y) &&
+                (box->max.z <= max.z));
+    return res;
+  };
+  bool Contains(Vector3 p) const {
+    bool res = ((p.x >= min.x) &&
+                (p.y >= min.y) &&
+                (p.z >= min.z) &&
+                (p.x <= max.x) &&
+                (p.y <= max.y) &&
+                (p.z <= max.z));
+    return res;
+  };
   BBox() { this->min = Vector3(); this->max = Vector3(); };
+  virtual ~BBox() {}
+
 };
 
 

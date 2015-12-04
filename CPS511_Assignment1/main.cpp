@@ -1,6 +1,5 @@
 #include "Modeller.h"
 #include "GLApp.h"
-#include <windows.h>
 
 int main(int argc, char** argv)
 {

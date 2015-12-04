@@ -131,6 +131,7 @@
     <ClCompile Include="Modeller.cpp" />
     <ClCompile Include="QuadMesh.cpp" />
     <ClCompile Include="CubeMesh.cpp" />
+    <ClCompile Include="Room.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
@@ -139,6 +140,7 @@
     <ClInclude Include="Modeller.h" />
     <ClInclude Include="QuadMesh.h" />
     <ClInclude Include="GLUtils.h" />
+    <ClInclude Include="Room.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -14,6 +14,7 @@
 #include "GLUtils.h"
 #include "CubeMesh.h"
 #include "GLApp.h"
+#include "Room.h"
 
 class Modeller: public GLApp
 {
@@ -39,10 +40,7 @@ public:
 
   enum Action currentAction = TRANSLATE;
 
-  QuadMesh *floorMesh = nullptr;
-  QuadMesh *wallMeshes[3];
-  BBox *roomBox;
-  int meshSize = 16;
+  std::vector<Room*> rooms;
   std::vector<Line> lines;
 };
 #endif

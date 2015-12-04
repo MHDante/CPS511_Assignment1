@@ -15,36 +15,13 @@ Modeller::Modeller()
 }
 
 void Modeller::setUpScene() {
-  // Set up meshes
-  Vector3 origin = Vector3(-8.0f, 0.0f, 8.0f);
-  Vector3 dir1v = Vector3(1.0f, 0.0f, 0.0f) * 16;
-  Vector3 dir2v = Vector3(0.0f, 0.0f, -1.0f) * 16;
-  Vector4 diffuse = Vector4(0.9f, 0.5f, 0.0f, 1);
-  floorMesh = new QuadMesh(meshSize, origin, dir1v, dir2v);
-  floorMesh->material.diffuse = diffuse;
+  rooms.push_back(new Room(Vector3(-4.0f, 0, -4.0), Vector3(4.0f, 4.0, 4.0)));
+  rooms.push_back(rooms[0]->SpawnRoom(Room::LEFT));
+  rooms.push_back(rooms[1]->SpawnRoom(Room::FORWARD));
+  rooms.push_back(rooms[1]->SpawnRoom(Room::BACK));
+  rooms.push_back(rooms[3]->SpawnRoom(Room::BACK));
 
-  diffuse = Vector4(0, 1, 0.0f, 4);
-  origin = Vector3(-8.0f, 0.0f, 8.0f);
-  dir1v = Vector3(0.0f, 0.0f, -1.0f) * 16;
-  dir2v = Vector3(0.0f, .25f, 0.0f) * 16;
-  wallMeshes[0] = new QuadMesh(meshSize, origin, dir1v, dir2v);
-  wallMeshes[0]->material.diffuse = diffuse;
-
-  origin = Vector3(8.0f, 0.0f, -8.0f);
-  dir1v = Vector3(0.0f, 0.0f, 1.0f) * 16;
-  dir2v = Vector3(0.0f, .25f, 0.0f) * 16;
-  wallMeshes[1] = new QuadMesh(meshSize, origin, dir1v, dir2v);
-  wallMeshes[1]->material.diffuse = diffuse;
-
-  origin = Vector3(-8.0f, 0.0f, -8.0f);
-  dir1v = Vector3(1.0f, 0.0f, 0.0f) * 16;
-  dir2v = Vector3(0.0f, .25f, 0.0f) * 16;
-  wallMeshes[2] = new QuadMesh(meshSize, origin, dir1v, dir2v);
-  wallMeshes[2]->material.diffuse = diffuse;
-
-  roomBox = new BBox(Vector3(-8.0f, 0, -8.0), Vector3(8.0f, 6.0, 8.0));
-
-  mainCamera->pos = Vector3(0.0, 6.0, 22.0);
+  mainCamera->pos = Vector3(0.0, 18.0, 22.0);
   mainCamera->target = Vector3(0.0, 0.0, 0.0);
   mainCamera->up = Vector3(0.0, 1.0, 0.0);
   mainCamera->fovY = 60.0;
@@ -62,19 +39,9 @@ void Modeller::setUpScene() {
     // Set up the camera
     mainCamera->display();
     // Draw all cubes (see CubeMesh.h)
-    for (auto& c : cubes) {
-      c->drawCube();
-    }
-    // Draw floor and wall meshes
-    floorMesh->DrawMesh();
-    for (auto& w : wallMeshes) {
-      w->DrawMesh();
-    }
-    wallMeshes[0]->DrawMesh();
-
-    for (auto& l : lines) {
-      l.Draw();
-    }
+    for (auto& c : cubes) c->drawCube();
+    for (auto& r : rooms) r->Draw();
+    for (auto& l : lines) l.Draw();
     glutSwapBuffers();
   }
 
@@ -208,6 +175,8 @@ void Modeller::setUpScene() {
       }
       if (selector == nullptr) std::cout << "CurrentBlock: No block selected." << std::endl;
       if (selector != nullptr) std::cout << "CurrentBlock: Pos:" + selector->center.toString() + " Size:" + selector->dim.toString() + " Rotation:" + floatToSmallString(selector->angle) << std::endl;
+      for (auto& r : rooms) {std::cout << r->min.toString() +"       ";}
+
     }
   }
 
@@ -261,7 +230,7 @@ void Modeller::setUpScene() {
     auto diff = Vector3();
     switch (key) {
     case GLUT_KEY_F1: {
-      auto c = new CubeMesh();
+      auto c = new CubeMesh(rooms[0]);
       c->center.SetY(1);
       cubes.push_back(c);
       selectCube(c);
@@ -277,11 +246,11 @@ void Modeller::setUpScene() {
       bool clear = true;
       attempt:
       switch (currentAction) {
-      case TRANSLATE: for (auto& c : selectedCubes) clear &= c->translate(diff, roomBox); break;
-      case SCALE:     for (auto& c : selectedCubes) clear &= c->scale(diff, roomBox); break;
-      case ROTATE:    for (auto& c : selectedCubes) clear &= c->rotate(diff, roomBox); break;
-      case EXTRUDE:   for (auto& c : selectedCubes) clear &= c->extrude(diff, roomBox); break;
-      case RAISE:     for (auto& c : selectedCubes) clear &= c->raise(diff, roomBox); break;
+      case TRANSLATE: for (auto& c : selectedCubes) clear &= c->translate(diff); break;
+      case SCALE:     for (auto& c : selectedCubes) clear &= c->scale(diff); break;
+      case ROTATE:    for (auto& c : selectedCubes) clear &= c->rotate(diff); break;
+      case EXTRUDE:   for (auto& c : selectedCubes) clear &= c->extrude(diff); break;
+      case RAISE:     for (auto& c : selectedCubes) clear &= c->raise(diff); break;
       case SELECT:          select(diff); break;
       case MULTIPLESELECT:  select(diff); break;
       }

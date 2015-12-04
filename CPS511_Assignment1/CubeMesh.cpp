@@ -1,11 +1,12 @@
 #include "CubeMesh.h"
+#include "Room.h"
 
 Material CubeMesh::material = Material(Vector4(0, 0.05f, 0, 1), Vector4(0, 0, 0.004f, 1), Vector4(0, 0.5f, 0.5f, 1), 0);
 Material CubeMesh::highlightMaterial = Material(Vector4(0, 0, 0, 1.0), Vector4(0, 0, 0, 1), Vector4(1, 0, 0, 1), 0);
 
 bool CubeMesh::singleSelecting = true;
 
-CubeMesh::CubeMesh()
+CubeMesh::CubeMesh(Room* rm):room(rm)
 {
   
   selected = false;
@@ -43,16 +44,6 @@ BBox CubeMesh::getBBox() const
   return b;
 }
 
-
-
-bool CubeMesh::isWithin(BBox* a) const
-{
-  auto b = getBBox();
-  bool res = ((a->min.x <= b.min.x) && (a->min.y <= b.min.y) && (a->min.z <= b.min.z) &&
-    (a->max.x >= b.max.x) && (a->max.y >= b.max.y) && (a->max.z >= b.max.z));
-  return res;
-}
-
 void CubeMesh::drawSelector() const {
   glPushMatrix();
 
@@ -87,13 +78,20 @@ void CubeMesh::drawCube() const
   glPopAttrib();
 }
 
-bool CubeMesh::translate(Vector3 diff, BBox* bounds)
+bool CubeMesh::translate(Vector3 diff)
 {
   center += diff*.2;
-  return isWithin(bounds);
+  BBox b = getBBox();
+  if( room->Contains(&b)) {
+    if(!room->Contains(center)) {
+      room = room->roomAt(center);
+    }
+    return true;
+  }
+  return false;
 }
 
-bool CubeMesh::scale(Vector3 diff, BBox* bounds)
+bool CubeMesh::scale(Vector3 diff)
 {
 
   diff.x = diff.x == 1 ? 1.25f : diff.x == -1 ? 0.8f : 1;
@@ -101,26 +99,32 @@ bool CubeMesh::scale(Vector3 diff, BBox* bounds)
   if ((angle > 45 && angle < 135) || (angle > 225 && angle < 315)) diff = Vector3(diff.z, 0, diff.x);
   dim.SetX(dim.x * diff.x);
   dim.SetZ(dim.z * diff.z);
-  return isWithin(bounds) && dim.x > 0.1 && dim.z > 0.1;
+  BBox b = getBBox();
+
+  return room->Contains(&b) && dim.x > 0.1 && dim.z > 0.1;
 }
-bool CubeMesh::rotate(Vector3 diff, BBox* bounds)
+bool CubeMesh::rotate(Vector3 diff)
 {
   diff *= 5;
   angle = int(angle + diff.x + diff.z) % 360;
-  return isWithin(bounds);
+  BBox b = getBBox();
+
+  return room->Contains(&b);
 }
-bool CubeMesh::extrude(Vector3 diff, BBox* bounds)
+bool CubeMesh::extrude(Vector3 diff)
 {
   dim.SetY(dim.y + diff.x - diff.z);
   center.SetY(center.y + (diff.x - diff.z)*.5);
+  BBox b = getBBox();
 
-  return isWithin(bounds) && dim.y > 0.1;;
+  return room->Contains(&b) && dim.y > 0.1;;
 }
-bool CubeMesh::raise(Vector3 diff, BBox* bounds)
+bool CubeMesh::raise(Vector3 diff)
 {
   center.SetY(center.y + (diff.x - diff.z)*.5);
+  BBox b = getBBox();
 
-  return isWithin(bounds);
+  return room->Contains(&b);
 }
 
 Vector3 CubeMesh::Intersects(Ray ray) const {
