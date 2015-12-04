@@ -4,16 +4,20 @@
 
 #include "CubeMesh.h"
 #include "Camera.h"
+#include "Bullet.h"
 
 class Game;
 
 class Player : public CubeMesh
 {
 public:
+	Game * game;
 	float mouseSensitivity, moveSpeed;
-  explicit Player(Room * room);
+  explicit Player(Game * game, Room * room);
 	void turnPlayer(int xMouseDiff);
-  void movePlayer(int x, int y);
+	void update();
+	void movePlayer(int x, int y);
+	void spawnBullet();
   void drawCube() const override;
 private:
 	int xMousePrev = 0;

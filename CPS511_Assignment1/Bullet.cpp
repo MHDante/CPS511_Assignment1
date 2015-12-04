@@ -12,6 +12,10 @@ void Bullet::setVelocity(Vector3 dir)
 
 void Bullet::update()
 {
+	if (lifeLeft-- <= 0)
+	{
+		//disappear bullet
+	}
 	translate(velocity);
 }
 
@@ -25,7 +29,7 @@ void Bullet::display()
 	Material* matptr = selected ? &highlightMaterial : &material;
 	matptr->glApply();
 	GLUquadricObj *sphereObj = gluNewQuadric();
-	gluSphere(sphereObj, 1.0f, 10, 10);
+	gluSphere(sphereObj, 0.2f, 10, 10);
 	glPopMatrix();
 	//glPopAttrib();
 }

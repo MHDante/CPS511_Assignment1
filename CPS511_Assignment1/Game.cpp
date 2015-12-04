@@ -33,13 +33,13 @@ void Game::setUpScene() {
 	mainCamera->nearZ = 1.0f;
 	mainCamera->farZ = 40.0;
 
-	player = new Player(rooms[0]);
+	player = new Player(this, rooms[0]);
 	
 	player->center = Vector3(0.0, 2.0, 0.0);
 
 	recenterMouse();
 	player->turnPlayer(0);
-  mainCamera->Follow(player);
+	mainCamera->Follow(player);
 	glutSetCursor(GLUT_CURSOR_NONE);
 }
 
@@ -57,6 +57,11 @@ void Game::display(void)
 
 	player->drawCube();
 
+	for (auto& b : bullets)
+	{
+		b->display();
+	}
+
 	glutSwapBuffers();
 }
 
@@ -72,8 +77,7 @@ void Game::mouse(int button, int state, int xMouse, int yMouse)
 	case GLUT_LEFT_BUTTON:
 		if (state == GLUT_DOWN)
 		{
-
-
+			player->spawnBullet();
 			//if (currentAction == SELECT || currentAction == MULTIPLESELECT) {
 				Ray ray = mainCamera->ScreenToWorldRay(xMouse, yMouse);
 				lines.clear();
@@ -102,7 +106,7 @@ void Game::mouse(int button, int state, int xMouse, int yMouse)
 // Mouse motion callback - use only if you want to 
 void Game::mouseMotionHandler(int xMouse, int yMouse)
 {
-	//printf("%d :: %d\n", xMouse, yMouse);
+	printf("%d :: %d\n", xMouse, yMouse);
 	int xdiff = centerX - xMouse;
   if (xdiff != 0) {
     player->turnPlayer(xdiff);
@@ -178,7 +182,10 @@ void Game::idleFunc()
 {
 	//printf("%f %f\n", rightLeft.x + rightLeft.y, upDown.x + upDown.y);
 	player->movePlayer(rightLeft.x + rightLeft.y, upDown.x + upDown.y);
-
+	for(auto& b : bullets)
+	{
+		b->update();
+	}
 	glutPostRedisplay();
 }
 
