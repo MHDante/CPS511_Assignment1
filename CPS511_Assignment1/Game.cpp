@@ -105,7 +105,7 @@ void Game::mouse(int button, int state, int xMouse, int yMouse)
 // Mouse motion callback - use only if you want to 
 void Game::mouseMotionHandler(int xMouse, int yMouse)
 {
-	printf("%d :: %d\n", xMouse, yMouse);
+	//printf("%d :: %d\n", xMouse, yMouse);
 	int xdiff = centerX - xMouse;
   if (xdiff != 0) {
     player->turnPlayer(xdiff);
