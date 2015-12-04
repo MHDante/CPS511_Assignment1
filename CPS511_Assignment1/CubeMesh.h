@@ -42,7 +42,7 @@ public:
   CubeMesh(Room* room);
   void drawSelector() const;
   BBox getBBox() const;
-  void drawCube() const;
+  virtual void drawCube() const;
   bool translate(Vector3 diff);
   bool rotateEulers(Vector3 rot);
   bool scale(Vector3 diff);

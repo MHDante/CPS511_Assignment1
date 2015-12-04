@@ -79,15 +79,17 @@ void CubeMesh::drawCube() const
 
 bool CubeMesh::translate(Vector3 diff)
 {
-  center += diff*.2;
+  center += diff*.4;
   BBox b = getBBox();
+  center -= diff*.2;
+
   if( room->Contains(&b)) {
     if(!room->Contains(center)) {
       room = room->roomAt(center);
     }
     return true;
   }
-  return false;
+  return room->Contains(center) && room->Contains(center + diff);
 }
 
 bool CubeMesh::scale(Vector3 diff)

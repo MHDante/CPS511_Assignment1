@@ -9,7 +9,8 @@
 //=********************************************************************
 Game::Game()
 {
-	ScreenWidth = ScreenHeight = 500;
+  ScreenWidth = 1000;
+  ScreenHeight = 800;
 	windowName = "Scene Game";
 	//centerX = glutGet(GLUT_WINDOW_X) + glutGet(GLUT_WINDOW_WIDTH) / 2;
 	//centerY = glutGet(GLUT_WINDOW_Y) + glutGet(GLUT_WINDOW_HEIGHT) / 2;
@@ -29,7 +30,7 @@ void Game::setUpScene() {
 	mainCamera->up = Vector3(0.0, 1.0, 0.0);
 	mainCamera->fovY = 60.0;
 	mainCamera->aspect = 1.0;
-	mainCamera->nearZ = 2.0;
+	mainCamera->nearZ = 1.0f;
 	mainCamera->farZ = 40.0;
 
 	player = new Player(rooms[0]);

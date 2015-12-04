@@ -13,7 +13,8 @@ public:
 	float mouseSensitivity, moveSpeed;
   explicit Player(Room * room);
 	void turnPlayer(int xMouseDiff);
-	void movePlayer(int x, int y);
+  void movePlayer(int x, int y);
+  void drawCube() const override;
 private:
 	int xMousePrev = 0;
 };

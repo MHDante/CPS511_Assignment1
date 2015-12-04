@@ -7,7 +7,7 @@ GLApp::GLApp()
 {
   instance__ = this;
   windowName = "OpenGL App";
-  ScreenWidth = ScreenHeight = 100;
+  ScreenWidth = ScreenHeight = 500;
   mainCamera = new Camera(this);
 }
 // Setup openGL
