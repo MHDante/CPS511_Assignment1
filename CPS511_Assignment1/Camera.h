@@ -8,6 +8,7 @@
 #include <vector>
 #include "GLUtils.h"
 
+class CubeMesh;
 class GLApp;
 
 class Camera
@@ -21,8 +22,10 @@ public:
   double nearZ;
   double farZ;
   GLApp* glApp;
+  CubeMesh* parent;
   Camera::Camera(GLApp* gl_app);
- void display() const;
+  void Follow(CubeMesh* c);
+ void display();
   void perspective() const;
   Ray ScreenToWorldRay(int x, int y) const;
 };

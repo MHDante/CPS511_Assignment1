@@ -1,6 +1,7 @@
 ﻿#include "Camera.h"
 #include "GLApp.h"
 #include <iostream>
+#include "CubeMesh.h"
 
 Camera::Camera(GLApp* gl_app) {
     glApp = gl_app;
@@ -13,8 +14,19 @@ Camera::Camera(GLApp* gl_app) {
     up = Vector3(0, 1, 0);
   }
 
-  void Camera::display() const
+void Camera::Follow(CubeMesh* c) {
+  parent = c;
+}
+
+void Camera::display()
   {
+    if (parent != nullptr) {
+
+      pos = parent->center;
+      float ang = parent->rotation.y * DEG2RAD - M_PIl / 2;
+      auto forwardDir = Vector3(-cos(ang), 0, sin(ang));
+      target = pos + forwardDir;
+    }
     gluLookAt(pos.x, pos.y, pos.z, target.x, target.y, target.z, up.x, up.y, up.z);
   }
   void Camera::perspective() const
