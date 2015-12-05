@@ -13,7 +13,7 @@ class Player : public CubeMesh
 public:
 	Game * game;
 	float mouseSensitivity, moveSpeed;
-  explicit Player(Game * game, Room * room);
+  explicit Player(Game * game);
 	void turnPlayer(int xMouseDiff);
 	void update();
 	void movePlayer(int x, int y);

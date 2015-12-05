@@ -37,9 +37,8 @@ public:
   bool hovered;
   static Material material; // Material properties for drawing
   static Material highlightMaterial;	// Material properties if selected
-  Room* room;
   //Methods
-  CubeMesh(Room* room);
+  CubeMesh();
   void drawSelector() const;
   BBox getBBox() const;
   virtual void drawCube() const;

@@ -310,5 +310,10 @@ public:
 
 };
 
+inline double randZeroToOne()
+{
+
+  return rand() / (RAND_MAX + 1.);
+}
 
 #endif	//VECTOR3D_H

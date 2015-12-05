@@ -6,11 +6,20 @@
 //=******************************************************************
 //Scene Modelling Program
 //=********************************************************************
-Player::Player(Game*g,Room*r):CubeMesh(r)
+Player::Player(Game*g)
 {
 	this->game = g;
-	mouseSensitivity = .1f;
-	moveSpeed = 0.6f;
+
+
+  mouseSensitivity = .1f;
+  moveSpeed = 0.6f;
+  auto dante = true;
+
+  if (dante) {
+    mouseSensitivity /= 2;
+    moveSpeed /= 4;
+  }
+
 }
 
 void Player::turnPlayer(int xMouseDiff)
@@ -36,7 +45,7 @@ void Player::update()
 
 void Player::spawnBullet()
 {
-	Bullet * bullet = new Bullet(room);
+	Bullet * bullet = new Bullet();
 	bullet->center = center;
 	Vector3 forwardDir = Vector3(0, 0, -1).GetRotatedY(-rotation.y);
 	bullet->setVelocity(forwardDir);
