@@ -1,5 +1,6 @@
 #include "CubeMesh.h"
 #include "Room.h"
+#include "Game.h"
 
 Material CubeMesh::material = Material(Vector4(0, 0.05f, 0, 1), Vector4(0, 0, 0.004f, 1), Vector4(0, 0.5f, 0.5f, 1), 0);
 Material CubeMesh::highlightMaterial = Material(Vector4(0, 0, 0, 1.0), Vector4(0, 0, 0, 1), Vector4(1, 0, 0, 1), 0);
@@ -80,12 +81,24 @@ void CubeMesh::drawCube() const
 bool CubeMesh::translate(Vector3 diff)
 {
   center += diff*.4;
-  BBox b = getBBox();
-  center -= diff*.2;
   auto room = Room::roomAt(center);
-  return(room != nullptr && (room->Contains(&b) || room->Contains(center + diff)));
+  return checkCollision(true);
 }
+bool CubeMesh::checkCollision(bool pointbased) const {
 
+  BBox b = getBBox();
+  auto room = Room::roomAt(center);
+  bool roomCollisions =  room != nullptr && (room->Contains(&b) || (pointbased && room->Contains(center)));
+  if (!roomCollisions) 
+    return false;
+  for(auto& blocks : Game::instance->cubes) {
+    BBox other = blocks->getBBox();
+    if (other.Intersects(getBBox()) && !(pointbased && !other.Contains(center))) {
+      return false;
+    }
+  }
+  return true;
+}
 bool CubeMesh::scale(Vector3 diff)
 {
 
@@ -94,45 +107,30 @@ bool CubeMesh::scale(Vector3 diff)
   if ((rotation.y > 45 && rotation.y < 135) || (rotation.y > 225 && rotation.y < 315)) diff = Vector3(diff.z, 0, diff.x);
   dim.SetX(dim.x * diff.x);
   dim.SetZ(dim.z * diff.z);
-  BBox b = getBBox();
-  auto room = Room::roomAt(center);
-
-  return room->Contains(&b) && dim.x > 0.1 && dim.z > 0.1;
+  return checkCollision() && dim.x > 0.1 && dim.z > 0.1;
 }
 bool CubeMesh::rotate(Vector3 diff)
 {
   rotation.y = int(rotation.y + diff.y) % 360;
-  BBox b = getBBox();
-  auto room = Room::roomAt(center);
-
-  return room->Contains(&b);
+  return checkCollision();
 }
 bool CubeMesh::rotateEulers(Vector3 rot)
 {
 	rotation.x = int(rotation.x + rot.x) % 360;
 	rotation.y = int(rotation.y + rot.y) % 360;
 	rotation.z = int(rotation.z + rot.z) % 360;
-  BBox b = getBBox();
-  auto room = Room::roomAt(center);
-
-  return room->Contains(&b);
+  return checkCollision();
 }
 bool CubeMesh::extrude(Vector3 diff)
 {
   dim.SetY(dim.y + diff.x - diff.z);
   center.SetY(center.y + (diff.x - diff.z)*.5);
-  BBox b = getBBox();
-  auto room = Room::roomAt(center);
-
-  return room->Contains(&b) && dim.y > 0.1;;
+  return checkCollision() && dim.y > 0.1;;
 }
 bool CubeMesh::raise(Vector3 diff)
 {
   center.SetY(center.y + (diff.x - diff.z)*.5);
-  BBox b = getBBox();
-  auto room = Room::roomAt(center);
-
-  return room->Contains(&b);
+  return checkCollision();
 }
 
 Vector3 CubeMesh::Intersects(Ray ray) const {
