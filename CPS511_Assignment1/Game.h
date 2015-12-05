@@ -22,10 +22,10 @@ class Game : public GLApp
 {
 public:
 	// Cube Mesh Array variables and initialization
+  static Game* instance;
 	std::vector<CubeMesh*> cubes;
 	std::vector<Bullet*> bullets;
 	Player * player;
-	
 	Vector3 rightLeft, upDown;
 	int centerX;
 	int centerY;

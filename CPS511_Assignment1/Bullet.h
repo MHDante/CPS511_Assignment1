@@ -13,7 +13,7 @@ public:
 	float moveSpeed = 2;
 	int lifeLeft = 1000;
 	Vector3 velocity;
-	explicit Bullet(Room* r);
+	Bullet();
 	void setVelocity(Vector3 dir);
 	void update();
 	void display();

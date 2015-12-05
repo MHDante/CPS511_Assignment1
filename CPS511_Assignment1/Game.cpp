@@ -3,12 +3,13 @@
 #include <iostream>
 #include <thread>
 
-
+Game* Game::instance = nullptr;
 //=******************************************************************
 //Scene Modelling Program
 //=********************************************************************
 Game::Game()
 {
+  instance = this;
   ScreenWidth = 1000;
   ScreenHeight = 800;
 	windowName = "Scene Game";
@@ -19,7 +20,7 @@ Game::Game()
 }
 
 void Game::setUpScene() {
-  rooms.push_back(new Room(Vector3(-4.0f, 0, -4.0), Vector3(4.0f, 3.0, 4.0)));
+  rooms.push_back(new Room(Vector3(-4.0f, 0, -4.0), Vector3(8.0f, 3.0, 8.0)));
   rooms.push_back(rooms[0]->SpawnRoom(Room::LEFT));
   rooms.push_back(rooms[1]->SpawnRoom(Room::FORWARD));
   rooms.push_back(rooms[1]->SpawnRoom(Room::BACK));
@@ -33,7 +34,7 @@ void Game::setUpScene() {
 	mainCamera->nearZ = 1.0f;
 	mainCamera->farZ = 40.0;
 
-	player = new Player(this, rooms[0]);
+	player = new Player(this);
 	
 	player->center = Vector3(0.0, 2.0, 0.0);
 

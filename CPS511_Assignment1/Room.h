@@ -7,7 +7,7 @@
 class Room : public BBox {
 public:
   using BBox::Contains;
-
+  static std::unordered_set<Room*> allRooms;
   enum Direction { LEFT, FORWARD, RIGHT, BACK };
   int meshSize = 16;
   QuadMesh *floorMesh = nullptr;
@@ -16,8 +16,12 @@ public:
   Room(Vector3 min, Vector3 max);
   ~Room() {}
 
-  Room* roomAt(Vector3 center);
+  static Room* roomAt(Vector3 center);
   virtual bool Contains(BBox* box) const override;
+  float width() const;
+  float depth() const;
+  float height() const;
+  Vector3 center() const;
   Room* SpawnRoom(Direction dir);
   void Draw() const;
 

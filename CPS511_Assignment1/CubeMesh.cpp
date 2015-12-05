@@ -6,7 +6,7 @@ Material CubeMesh::highlightMaterial = Material(Vector4(0, 0, 0, 1.0), Vector4(0
 
 bool CubeMesh::singleSelecting = true;
 
-CubeMesh::CubeMesh(Room* rm):room(rm)
+CubeMesh::CubeMesh()
 {
   
   selected = false;
@@ -82,14 +82,8 @@ bool CubeMesh::translate(Vector3 diff)
   center += diff*.4;
   BBox b = getBBox();
   center -= diff*.2;
-
-  if( room->Contains(&b)) {
-    if(!room->Contains(center)) {
-      room = room->roomAt(center);
-    }
-    return true;
-  }
-  return room->Contains(center) && room->Contains(center + diff);
+  auto room = Room::roomAt(center);
+  return(room != nullptr && (room->Contains(&b) || room->Contains(center + diff)));
 }
 
 bool CubeMesh::scale(Vector3 diff)
@@ -101,6 +95,7 @@ bool CubeMesh::scale(Vector3 diff)
   dim.SetX(dim.x * diff.x);
   dim.SetZ(dim.z * diff.z);
   BBox b = getBBox();
+  auto room = Room::roomAt(center);
 
   return room->Contains(&b) && dim.x > 0.1 && dim.z > 0.1;
 }
@@ -108,6 +103,8 @@ bool CubeMesh::rotate(Vector3 diff)
 {
   rotation.y = int(rotation.y + diff.y) % 360;
   BBox b = getBBox();
+  auto room = Room::roomAt(center);
+
   return room->Contains(&b);
 }
 bool CubeMesh::rotateEulers(Vector3 rot)
@@ -116,6 +113,8 @@ bool CubeMesh::rotateEulers(Vector3 rot)
 	rotation.y = int(rotation.y + rot.y) % 360;
 	rotation.z = int(rotation.z + rot.z) % 360;
   BBox b = getBBox();
+  auto room = Room::roomAt(center);
+
   return room->Contains(&b);
 }
 bool CubeMesh::extrude(Vector3 diff)
@@ -123,6 +122,7 @@ bool CubeMesh::extrude(Vector3 diff)
   dim.SetY(dim.y + diff.x - diff.z);
   center.SetY(center.y + (diff.x - diff.z)*.5);
   BBox b = getBBox();
+  auto room = Room::roomAt(center);
 
   return room->Contains(&b) && dim.y > 0.1;;
 }
@@ -130,6 +130,7 @@ bool CubeMesh::raise(Vector3 diff)
 {
   center.SetY(center.y + (diff.x - diff.z)*.5);
   BBox b = getBBox();
+  auto room = Room::roomAt(center);
 
   return room->Contains(&b);
 }
