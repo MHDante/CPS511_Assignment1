@@ -42,6 +42,8 @@ void Game::setUpScene() {
 	player->turnPlayer(0);
 	mainCamera->Follow(player);
 	glutSetCursor(GLUT_CURSOR_NONE);
+	glEnable(GL_TEXTURE_2D);
+	loadTextures();
 }
 
 void Game::display(void)
@@ -193,4 +195,37 @@ void Game::idleFunc()
 void Game::recenterMouse()
 {
 	glutWarpPointer(centerX, centerY);
+}
+
+void Game::loadTextures()
+{
+	loadTexture("tiles01.bmp", Textures::TILES01);
+}
+void Game::loadTexture(const char * filename, Textures tex)
+{
+	GLuint textureId;
+	glGenTextures(1, &textureId);
+
+	pixmaps[tex] = RGBpixmap();
+	textureMap[tex] = textureId;
+
+	pixmaps[tex].readBMPFile(filename);
+
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1); // store pixels by byte	
+	glBindTexture(GL_TEXTURE_2D, textureId); // select current texture (0)
+	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexImage2D( // initialize texture
+		GL_TEXTURE_2D, // texture is 2-d
+		0, // resolution level 0
+		GL_RGB, // internal format
+		pixmaps[tex].nCols, // image width
+		pixmaps[tex].nRows, // image height
+		0, // no border
+		GL_RGB, // my format
+		GL_UNSIGNED_BYTE, // my type
+		pixmaps[tex].pixel); // the pixels
+
+
 }

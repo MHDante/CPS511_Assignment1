@@ -10,6 +10,7 @@ class QuadMesh{
   Vector3 origin, length, width;
   int numVertices;
   Vector3 *vertices;
+  GLfloat * texcoords;
   int numQuads;
   GLuint *quads;
 

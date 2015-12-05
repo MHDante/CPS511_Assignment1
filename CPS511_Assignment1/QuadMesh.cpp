@@ -6,6 +6,7 @@ QuadMesh::QuadMesh(int meshSize, Vector3 origin, Vector3 length, Vector3 width) 
   numVertices = (meshSize + 1) * (meshSize + 1);
   numQuads = (meshSize)* (meshSize);
   vertices = new Vector3[numVertices];
+  texcoords = new GLfloat[numVertices * 2];
   quads = new GLuint[numQuads * 4];
 
   // Setup the material and lights used for the mesh
@@ -21,7 +22,10 @@ QuadMesh::QuadMesh(int meshSize, Vector3 origin, Vector3 length, Vector3 width) 
   int currentVertex = 0;
   for (int i = 0; i < meshSize + 1; i++) {
     for (int j = 0; j < meshSize + 1; j++) {
-      vertices[currentVertex++] = origin + length * j;
+      vertices[currentVertex] = origin + length * j;
+	  texcoords[currentVertex * 2] = (float)i / meshSize;
+	  texcoords[currentVertex * 2 + 1] = (float)j / meshSize;
+	  currentVertex++;
     }
     origin += width; // go to next row in mesh (negative z direction)
   }
@@ -38,6 +42,7 @@ QuadMesh::QuadMesh(int meshSize, Vector3 origin, Vector3 length, Vector3 width) 
     }
   }
   glEnableClientState(GL_VERTEX_ARRAY);
+  glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 }
 
 QuadMesh::~QuadMesh() {
@@ -47,8 +52,10 @@ QuadMesh::~QuadMesh() {
 
 void QuadMesh::DrawMesh(Material* mat) const {
   (mat == nullptr?material:*mat).glApply();
+  
   glNormal3f(normal.x, normal.y, normal.z);
   glVertexPointer(3, GL_FLOAT, sizeof(Vector3), vertices);
+  glTexCoordPointer(2, GL_FLOAT, sizeof(GLfloat) * 2, texcoords);
   glDrawElements(GL_QUADS, numQuads * 4, GL_UNSIGNED_INT, quads);
 }
 
