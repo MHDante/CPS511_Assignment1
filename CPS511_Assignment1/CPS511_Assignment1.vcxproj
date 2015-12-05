@@ -133,6 +133,7 @@
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="QuadMesh.cpp" />
     <ClCompile Include="CubeMesh.cpp" />
+    <ClCompile Include="RGBpixmap.cpp" />
     <ClCompile Include="Room.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -144,6 +145,7 @@
     <ClInclude Include="Player.h" />
     <ClInclude Include="QuadMesh.h" />
     <ClInclude Include="GLUtils.h" />
+    <ClInclude Include="RGBpixmap.h" />
     <ClInclude Include="Room.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
