@@ -6,8 +6,8 @@
 Camera::Camera(GLApp* gl_app) {
     glApp = gl_app;
     fovY = 60;
-    aspect = glApp->ScreenWidth / glApp->ScreenHeight;
-    nearZ = 0.3;
+    aspect = float(glApp->ScreenWidth) / float(glApp->ScreenHeight);
+    nearZ = 0.3f;
     farZ = 100;
     target = Vector3(0,0,0);
     pos = Vector3(0,0,10);
@@ -37,8 +37,8 @@ void Camera::display()
   Ray Camera::ScreenToWorldRay(int x, int y) const
   {
     y = glApp->ScreenHeight -y; //Opengl...
-    float xRatio = (glApp->ScreenWidth / 2.0);
-    float yRatio = (glApp->ScreenHeight / 2.0);
+    float xRatio = (glApp->ScreenWidth / 2.0f);
+    float yRatio = (glApp->ScreenHeight / 2.0f);
     float zRatio = tan(fovY * DEG2RAD);
     Vector3 eyeDir = Vector3(x / xRatio, y/yRatio, zRatio);
     eyeDir.x *= aspect;

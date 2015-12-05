@@ -24,7 +24,9 @@ private:
 public:
 	virtual ~CubeMesh()
 	{
-		delete [](faces);
+    for (auto& f : faces) {
+      delete f;
+    }
 	}
 
 	Vector3 center;

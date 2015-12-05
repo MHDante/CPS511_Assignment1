@@ -59,7 +59,7 @@ void GLApp::init(int argc, char **argv)
   // Other OpenGL setup
   glEnable(GL_DEPTH_TEST);
   glShadeModel(GL_SMOOTH);
-  glClearColor(0.6, 0.6, 0.6, 0.0);
+  glClearColor(0.6f, 0.6f, 0.6f, 0.0f);
   glClearDepth(1.0f);
   glEnable(GL_DEPTH_TEST);
   // This one is important - renormalize normal vectors 

@@ -16,7 +16,7 @@ public:
   explicit Player(Game * game);
 	void turnPlayer(int xMouseDiff);
 	void update();
-	void movePlayer(int x, int y);
+	void movePlayer(float x, float y);
 	void spawnBullet();
   void drawCube() const override;
 private:

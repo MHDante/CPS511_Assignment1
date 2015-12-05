@@ -16,18 +16,18 @@ QuadMesh::QuadMesh(int meshSize, Vector3 origin, Vector3 length, Vector3 width, 
   material = Material(
     Vector4(0, 0, 0, 1),
     Vector4(0, 0, 0, 1),
-    Vector4(.9, .5, .0, 1),
+    Vector4(.9f, .5f, .0f, 1),
     0.0);
 
-  length /= meshSize;
-  width /= meshSize;
+  length /= float(meshSize);
+  width /= float(meshSize);
 
   int currentVertex = 0;
   for (int i = 0; i < meshSize + 1; i++) {
     for (int j = 0; j < meshSize + 1; j++) {
-      vertices[currentVertex] = origin + length * j;
-	  texcoords[currentVertex * 2] = (float)i / meshSize;
-	  texcoords[currentVertex * 2 + 1] = (float)j / meshSize;
+    vertices[currentVertex] = origin + length * float(j);
+	  texcoords[currentVertex * 2] = float(i) / meshSize;
+	  texcoords[currentVertex * 2 + 1] = float(j) / meshSize;
 	  currentVertex++;
     }
     origin += width; // go to next row in mesh (negative z direction)

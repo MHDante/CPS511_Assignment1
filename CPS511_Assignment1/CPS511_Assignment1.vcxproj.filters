@@ -45,6 +45,9 @@
     <ClCompile Include="RGBpixmap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Transform.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CubeMesh.h">
@@ -76,6 +79,9 @@
     </ClInclude>
     <ClInclude Include="RGBpixmap.h">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Transform.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -30,12 +30,12 @@ void Player::turnPlayer(int xMouseDiff)
 	//xMousePrev = xMouse;
 }
 
-void Player::movePlayer(int x, int y)
+void Player::movePlayer(float x, float y)
 {
 	if (x == 0 && y == 0) return;
 	Vector3 forwardDir = Vector3(0,0,-1).GetRotatedY(-rotation.y);
   Vector3 rightDir = Vector3(1,0,0).GetRotatedY(-rotation.y);
-  Vector3 dir = (y * forwardDir + x * rightDir) * moveSpeed;
+  Vector3 dir = (forwardDir * y + rightDir * x) * moveSpeed;
   if (!translate(dir)) translate(-dir);
 	//printf("after : %f %f %f\n", center.x, center.y, center.z);
 }

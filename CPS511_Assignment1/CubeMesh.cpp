@@ -57,7 +57,7 @@ void CubeMesh::drawSelector() const {
   if (singleSelecting) highlightMaterial.glApply();
   else material.glApply();
 
-  glTranslatef(0, dim.y / 2 + 0.2, 0);
+  glTranslatef(0, dim.y / 2 + 0.2f, 0);
   glRotatef(270, 1, 0, 0);
   GLUquadricObj *quadObj = gluNewQuadric();
   gluCylinder(quadObj, 0, .5, 1, 10, 10);
@@ -86,8 +86,7 @@ void CubeMesh::drawCube() const
 
 bool CubeMesh::translate(Vector3 diff)
 {
-  center += diff*.4;
-  auto room = Room::roomAt(center);
+  center += diff*.4f;
   return checkCollision(true);
 }
 bool CubeMesh::checkCollision(bool pointbased) const {
@@ -117,25 +116,25 @@ bool CubeMesh::scale(Vector3 diff)
 }
 bool CubeMesh::rotate(Vector3 diff)
 {
-  rotation.y = int(rotation.y + diff.y) % 360;
+  rotation.y = float(fmod(rotation.y + diff.y , 360));
   return checkCollision();
 }
 bool CubeMesh::rotateEulers(Vector3 rot)
 {
-	rotation.x = int(rotation.x + rot.x) % 360;
-	rotation.y = int(rotation.y + rot.y) % 360;
-	rotation.z = int(rotation.z + rot.z) % 360;
+	rotation.x = float(fmod(rotation.x + rot.x,360));
+	rotation.y = float(fmod(rotation.y + rot.y,360));
+	rotation.z = float(fmod(rotation.z + rot.z,360));
   return checkCollision();
 }
 bool CubeMesh::extrude(Vector3 diff)
 {
   dim.SetY(dim.y + diff.x - diff.z);
-  center.SetY(center.y + (diff.x - diff.z)*.5);
+  center.SetY(center.y + (diff.x - diff.z)*.5f);
   return checkCollision() && dim.y > 0.1;;
 }
 bool CubeMesh::raise(Vector3 diff)
 {
-  center.SetY(center.y + (diff.x - diff.z)*.5);
+  center.SetY(center.y + (diff.x - diff.z)*.5f);
   return checkCollision();
 }
 

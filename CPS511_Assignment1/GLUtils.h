@@ -7,9 +7,8 @@
 #include <string>
 #include <sstream>
 #include <iomanip>
-# define M_PIl          3.141592653589793238462643383279502884L /* pi */
-
-#define DEG2RAD (3.14159265358979323846 / 180)
+# define M_PIl 3.14159265358979323846f
+#define DEG2RAD (M_PIl / 180)
 
 enum class Textures { TILES01, PROFESSOR };
 
@@ -141,8 +140,8 @@ public:
 	void RotateX(double angle);
 	Vector3 GetRotatedX(double angle) const;
 	void RotateY(double angle) {
-    float cn = cos(angle*DEG2RAD);
-    float sn = sin(angle*DEG2RAD);
+    float cn = float(cos(angle*DEG2RAD));
+    float sn = float(sin(angle*DEG2RAD)) ;
     auto tempx = x * cn - z * sn;
     auto tempz = z * cn + x * sn;
     x = tempx;
@@ -321,10 +320,10 @@ public:
 
 };
 
-inline double randZeroToOne()
+inline float randZeroToOne()
 {
 
-  return rand() / (RAND_MAX + 1.);
+  return rand() / (RAND_MAX + 1.f);
 }
 
 #endif	//VECTOR3D_H
