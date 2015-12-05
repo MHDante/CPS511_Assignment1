@@ -41,6 +41,7 @@ public:
   BBox getBBox() const;
   virtual void drawCube() const;
   bool translate(Vector3 diff);
+  bool checkCollision(bool pointBased = false) const;
   bool rotateEulers(Vector3 rot);
   bool scale(Vector3 diff);
   bool rotate(Vector3 diff);

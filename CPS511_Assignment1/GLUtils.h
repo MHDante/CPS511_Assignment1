@@ -297,6 +297,15 @@ public:
                 (box->max.y <= max.y) &&
                 (box->max.z <= max.z));
     return res;
+  }
+
+  bool Intersects(BBox other) const {
+    return(max.x > other.min.x &&
+           min.x < other.max.x &&
+           max.y > other.min.y &&
+           min.y < other.max.y &&
+           max.z > other.min.z &&
+           min.z < other.max.z);
   };
   bool Contains(Vector3 p) const {
     bool res = ((p.x >= min.x) &&
