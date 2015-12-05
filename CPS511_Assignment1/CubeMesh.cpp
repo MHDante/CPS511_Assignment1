@@ -6,14 +6,20 @@ Material CubeMesh::highlightMaterial = Material(Vector4(0, 0, 0, 1.0), Vector4(0
 
 bool CubeMesh::singleSelecting = true;
 
-CubeMesh::CubeMesh()
+CubeMesh::CubeMesh(Textures texture) : texture(texture)
 {
-  
   selected = false;
   hovered = false;
   rotation.Set(0, 0, 0);
   center.Set(0, 0, 0);
   dim.Set(2.0f, 2.0f, 2.0f);
+
+	faces[0] =new QuadMesh(1, Vector3(-1, 1, -1), Vector3(0, 0, 2), Vector3(2, 0, 0), texture);
+	faces[1] =new QuadMesh(1, Vector3(1, -1, 1), Vector3(-2, 0, 0), Vector3(0, 0, -2), texture);
+	faces[2] =new QuadMesh(1, Vector3(-1, -1, -1), Vector3(0, 0, 2), Vector3(0, 2, 0), texture);
+	faces[3] =new QuadMesh(1, Vector3(1, 1, 1), Vector3(0, -2, 0), Vector3(0, 0, -2), texture);
+	faces[4] =new QuadMesh(1, Vector3(1, 1, 1), Vector3(-2, 0, 0), Vector3(0, -2, 0), texture);
+	faces[5] =new QuadMesh(1, Vector3(-1, -1, -1), Vector3(0, 2, 0), Vector3(2, 0, 0), texture);
 }
 
 
@@ -71,7 +77,7 @@ void CubeMesh::drawCube() const
   Material* matptr = selected ? &highlightMaterial : &material;
 
   for(auto& face : faces) {
-    face.DrawMesh(matptr);
+    face->DrawMesh(matptr);
   }
   glPopMatrix();
   glPopAttrib();
@@ -157,7 +163,7 @@ Vector3 CubeMesh::Intersects(Ray ray) const {
 
   Vector3 ret = Vector3::Sentinel();
   for (auto& face : faces) {
-    auto hit = face.intersectsRay(ray);
+    auto hit = face->intersectsRay(ray);
     if (hit.isValid()) {
       hit.z *= dim.z/2;
       hit.x *= dim.x / 2;

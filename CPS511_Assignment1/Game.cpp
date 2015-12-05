@@ -200,6 +200,7 @@ void Game::recenterMouse()
 void Game::loadTextures()
 {
 	loadTexture("tiles01.bmp", Textures::TILES01);
+	loadTexture("professor.bmp", Textures::PROFESSOR);
 }
 void Game::loadTexture(const char * filename, Textures tex)
 {

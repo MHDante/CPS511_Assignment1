@@ -1,6 +1,9 @@
 #include "QuadMesh.h"
+#include "Game.h"
 
-QuadMesh::QuadMesh(int meshSize, Vector3 origin, Vector3 length, Vector3 width) : origin(origin), length(length), width(width) {
+
+QuadMesh::QuadMesh(int meshSize, Vector3 origin, Vector3 length, Vector3 width, Textures texture)
+	: origin(origin), length(length), width(width), texture(texture){
 
   normal = length.CrossProduct(width).Normalized();
   numVertices = (meshSize + 1) * (meshSize + 1);
@@ -53,6 +56,8 @@ QuadMesh::~QuadMesh() {
 void QuadMesh::DrawMesh(Material* mat) const {
   (mat == nullptr?material:*mat).glApply();
   
+  glBindTexture(GL_TEXTURE_2D, Game::instance->textureMap[texture]);
+
   glNormal3f(normal.x, normal.y, normal.z);
   glVertexPointer(3, GL_FLOAT, sizeof(Vector3), vertices);
   glTexCoordPointer(2, GL_FLOAT, sizeof(GLfloat) * 2, texcoords);

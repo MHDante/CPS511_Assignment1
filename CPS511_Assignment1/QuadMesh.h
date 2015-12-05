@@ -5,6 +5,7 @@
 #include <gl/gl.h>
 #include "GLUtils.h"
 
+
 class QuadMesh{
 
   Vector3 origin, length, width;
@@ -13,12 +14,12 @@ class QuadMesh{
   GLfloat * texcoords;
   int numQuads;
   GLuint *quads;
+  Textures texture;
 
 public:
   Vector3 normal;
   Material material;
-
-  explicit QuadMesh(int meshSize, Vector3 origin, Vector3 dir1, Vector3 dir2);
+  explicit QuadMesh(int meshSize, Vector3 origin, Vector3 dir1, Vector3 dir2, Textures texture);
   ~QuadMesh();
   void DrawMesh(Material* mat = nullptr) const;
   Vector3 intersectsRay(Ray r)const;

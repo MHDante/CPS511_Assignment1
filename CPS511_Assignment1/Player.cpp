@@ -6,14 +6,14 @@
 //=******************************************************************
 //Scene Modelling Program
 //=********************************************************************
-Player::Player(Game*g)
+Player::Player(Game*g):CubeMesh((Textures)0)
 {
 	this->game = g;
 
 
   mouseSensitivity = .1f;
   moveSpeed = 0.6f;
-  auto dante = true;
+  auto dante = false;
 
   if (dante) {
     mouseSensitivity /= 2;

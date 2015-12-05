@@ -11,7 +11,6 @@
 
 
 
-
 // Vertex positions of a standard size cube (width 2), centered at the origin
 // of its own Model Coordinate System
 
@@ -20,16 +19,14 @@ class Room;
 class CubeMesh
 {
 private:
-  QuadMesh faces[6] = {
-    QuadMesh(1, Vector3(-1, 1, -1), Vector3(0, 0, 2), Vector3(2, 0, 0)),
-    QuadMesh(1, Vector3(1, -1, 1), Vector3(-2, 0, 0), Vector3(0, 0, -2)),
-    QuadMesh(1, Vector3(-1, -1, -1), Vector3(0, 0, 2), Vector3(0, 2, 0)),
-    QuadMesh(1, Vector3(1, 1, 1), Vector3(0, -2, 0), Vector3(0, 0, -2)),
-    QuadMesh(1, Vector3(1, 1, 1), Vector3(-2, 0, 0), Vector3(0, -2, 0)),
-    QuadMesh(1, Vector3(-1, -1, -1), Vector3(0, 2, 0), Vector3(2, 0, 0))
-  };
+	QuadMesh *faces[6];
 
 public:
+	virtual ~CubeMesh()
+	{
+		delete [](faces);
+	}
+
 	Vector3 center;
 	Vector3 dim;
 	Vector3 rotation;				// Angle around y-axis of cube coordinate system
@@ -37,8 +34,9 @@ public:
   bool hovered;
   static Material material; // Material properties for drawing
   static Material highlightMaterial;	// Material properties if selected
+  Textures texture;
   //Methods
-  CubeMesh();
+  CubeMesh(Textures texture);
   void drawSelector() const;
   BBox getBBox() const;
   virtual void drawCube() const;

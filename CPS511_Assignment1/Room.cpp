@@ -11,17 +11,17 @@ Room::Room(Vector3 min, Vector3 max) :BBox(min,max) {
 
   // Set up meshes
   Vector4 diffuse = Vector4(0.9f, 0.5f, 0.0f, 1);
-  floorMesh = new QuadMesh(meshSize, min, forward, right);
+  floorMesh = new QuadMesh(meshSize, min, forward, right, Textures::PROFESSOR);
   floorMesh->material.diffuse = diffuse;
 
   diffuse = Vector4(0, 1, 0.0f, 4);
-  wallMeshes[LEFT] = new QuadMesh(meshSize, min, up, forward);
+  wallMeshes[LEFT] = new QuadMesh(meshSize, min, up, forward, Textures::TILES01);
   wallMeshes[LEFT]->material.diffuse = diffuse;
-  wallMeshes[FORWARD] = new QuadMesh(meshSize, min, right, up);
+  wallMeshes[FORWARD] = new QuadMesh(meshSize, min, right, up, Textures::TILES01);
   wallMeshes[FORWARD]->material.diffuse = diffuse;
-  wallMeshes[RIGHT] = new QuadMesh(meshSize, max, -forward, -up);
+  wallMeshes[RIGHT] = new QuadMesh(meshSize, max, -forward, -up, Textures::TILES01);
   wallMeshes[RIGHT]->material.diffuse = diffuse;
-  wallMeshes[BACK] = new QuadMesh(meshSize, max, -up, -right);
+  wallMeshes[BACK] = new QuadMesh(meshSize, max, -up, -right, Textures::TILES01);
   wallMeshes[BACK]->material.diffuse = diffuse;
   allRooms.insert(this);
 }
@@ -63,8 +63,8 @@ Room* Room::SpawnRoom(Direction dir) {
     case BACK: diff.SetZ(-depth());    break;
   }
 
-    CubeMesh* wall1 = new CubeMesh();
-    CubeMesh* wall2 = new CubeMesh();
+    CubeMesh* wall1 = new CubeMesh(Textures::TILES01);
+    CubeMesh* wall2 = new CubeMesh(Textures::TILES01);
     auto doorWidth = 2;
     float ratio = randZeroToOne();
     Vector3 leeway, start, end;

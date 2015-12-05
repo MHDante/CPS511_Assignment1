@@ -18,17 +18,14 @@
 #include "Player.h"
 #include "RGBpixmap.h"
 
-
 #include "Room.h"
-
-enum class Textures { TILES01 };
-
 
 class Game : public GLApp
 {
 public:
 	// Cube Mesh Array variables and initialization
   static Game* instance;
+  
 	std::vector<CubeMesh*> cubes;
 	std::vector<Bullet*> bullets;
 	std::map<Textures, GLuint> textureMap;
