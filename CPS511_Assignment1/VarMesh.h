@@ -6,10 +6,10 @@
 class VarMesh : public Transform {
 public:
   Material material;
+  void drawSelf() const override;
   explicit VarMesh(const char * path);
 
 public:
-  void Draw(Material* mat = nullptr) const;
   std::vector<Vector3> vertices;
   std::vector<Vector2> uvs;
   std::vector<Vector3> normals;

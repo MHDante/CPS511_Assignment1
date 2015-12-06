@@ -37,6 +37,8 @@ void Game::setUpScene() {
 
   cube = new VarMesh("megaman.obj");
 
+  cube->setPosition(Vector3(0.0f, -2, 0.0f));
+  cube->setScale(Vector3(0.2f,0.2f,0.2f));
 	recenterMouse();
 	glutSetCursor(GLUT_CURSOR_NONE);
 
@@ -59,7 +61,7 @@ void Game::display(void)
   for (auto& b : robots)b->draw();
 
 	player->draw();
-  cube->Draw();
+  cube->draw();
 
 	glutSwapBuffers();
 }
@@ -210,8 +212,8 @@ void Game::spawnEnemy()
 	int roomIndex = rand() % rooms.size();
 	Room * r = rooms[roomIndex];
 	Robot * robot = new Robot(this);
-  auto v = (r->max - r->min) * (randZeroToOne() * 0.6f + 0.2f) + r->min;
-  v.y = (r->min.y + r->max.y) / 2;
+  auto v = (r->bounds.max - r->bounds.min) * (randZeroToOne() * 0.6f + 0.2f) + r->bounds.min;
+  v.y = (r->bounds.min.y + r->bounds.max.y) / 2;
 	robot->setPosition(v);
 	robot->setRandDirection();
 	robots.push_back(robot);
@@ -261,7 +263,7 @@ void Game::loadTexture(const char * filename, Textures tex)
 
 Room* Game::roomAt(Vector3 center) {
 	for (auto& r : rooms) {
-		if (r != nullptr && r->Contains(center)) return r;
+		if (r != nullptr && r->bounds.Contains(center)) return r;
 	}
 	return nullptr;
 }

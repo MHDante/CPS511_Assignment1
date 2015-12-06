@@ -186,7 +186,8 @@ public:
     Matrix4&    operator+=(const Matrix4& rhs);         // add rhs and update this object
     Matrix4&    operator-=(const Matrix4& rhs);         // subtract rhs and update this object
     Vector4     operator*(const Vector4& rhs) const;    // multiplication: v' = M * v
-    Vector3     operator*(const Vector3& rhs) const;    // multiplication: v' = M * v
+  Vector3 applyTo(const Vector3& rhs, bool affine) const;
+  Vector3     operator*(const Vector3& rhs) const;    // multiplication: v' = M * v
     Matrix4     operator*(const Matrix4& rhs) const;    // multiplication: M3 = M1 * M2
     Matrix4&    operator*=(const Matrix4& rhs);         // multiplication: M1' = M1 * M2
     bool        operator==(const Matrix4& rhs) const;   // exact compare, no epsilon
@@ -806,11 +807,22 @@ inline Vector4 Matrix4::operator*(const Vector4& rhs) const
 
 
 
+
+inline Vector3 Matrix4::applyTo(const Vector3& rhs, bool affine = false)const
+{
+  if (affine) {
+    return Vector3(m[0] * rhs.x + m[4] * rhs.y + m[8] * rhs.z,
+      m[1] * rhs.x + m[5] * rhs.y + m[9] * rhs.z,
+      m[2] * rhs.x + m[6] * rhs.y + m[10] * rhs.z);
+  }
+  Vector4 v = operator*( Vector4(rhs.x, rhs.y, rhs.z, 1));
+
+  return Vector3(v.x, v.y, v.z);
+}
+
 inline Vector3 Matrix4::operator*(const Vector3& rhs) const
 {
-    return Vector3(m[0]*rhs.x + m[4]*rhs.y + m[8]*rhs.z,
-                   m[1]*rhs.x + m[5]*rhs.y + m[9]*rhs.z,
-                   m[2]*rhs.x + m[6]*rhs.y + m[10]*rhs.z);
+    return applyTo(rhs);
 }
 
 

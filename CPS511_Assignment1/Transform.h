@@ -14,8 +14,10 @@ private:
 
 protected:
   Matrix4 currentMatrix;
+  Matrix4 inverseMatrix;
 
   virtual void updateMatrix();
+  virtual void updateGeometry();
   virtual void drawSelf() const;
   virtual void drawChildren() const;
 public:
@@ -30,12 +32,14 @@ public:
   std::set<Transform*> children;
   Transform();
   explicit Transform(Transform* parent);
-  Vector3 getPosition() const;
+  Vector3 getWorldPos() const;
+  Vector3 getLocalPos() const;
   void setPosition(Vector3 position);
   Vector3 getScale() const;
   void setScale(Vector3 scale);
   Vector3 getRotation() const;
   void setRotation(Vector3 rotation);
   virtual ~Transform();
+  virtual BBox getBBox() const;
 };
 

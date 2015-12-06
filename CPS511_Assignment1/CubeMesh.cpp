@@ -20,32 +20,6 @@ CubeMesh::CubeMesh(Textures texture) : texture(texture)
 }
 
 
-// Given a cube mesh, compute it's current bounding box and return in vectors min and max
-// i.e. compute min.x,min.y,mi.z,max.x,max.y,max.z
-// Use this function for collision detection of cube and walls/floor
-BBox CubeMesh::getBBox() const
-{
-  //could be optimized by memoization
-
-  Vector3 edgePoints[4] = {
-    (Vector3(-getScale().x, 0,-getScale().z)*.5).GetRotatedY(getRotation().y),
-    (Vector3(-getScale().x, 0,getScale().z )*.5).GetRotatedY(getRotation().y),
-    (Vector3(getScale().x, 0,-getScale().z )*.5).GetRotatedY(getRotation().y),
-    (Vector3(getScale().x, 0,getScale().z  )*.5).GetRotatedY(getRotation().y) };
-
-  float maxX = FLT_MIN;
-  float maxZ = FLT_MIN;
-
-  for (auto pt : edgePoints) {
-    if (pt.x > maxX) maxX = pt.x;
-    if (pt.z > maxZ) maxZ = pt.z;
-  }
-  auto bounds = Vector3(maxX, getScale().y/2, maxZ);
-  auto b = BBox();
-  b.min = (getPosition() - (bounds) );
-  b.max = (getPosition() + (bounds) );
-  return b;
-}
 
 void CubeMesh::drawSelf() const
 {
@@ -64,13 +38,13 @@ void CubeMesh::drawSelf() const
 bool CubeMesh::checkCollision(bool pointbased) {
 
   BBox b = getBBox();
-  auto room = Game::instance->roomAt(getPosition());
-  bool roomCollisions =  room != nullptr && (room->Contains(&b) || (pointbased && room->Contains(getPosition())));
+  auto room = Game::instance->roomAt(getWorldPos());
+  bool roomCollisions =  room != nullptr && room->Contains(&b, pointbased);
   if (!roomCollisions) 
     return false;
   for(auto& blocks : Game::instance->cubes) {
     BBox other = blocks->getBBox();
-    if (other.Intersects(getBBox()) && !(pointbased && !other.Contains(getPosition()))) {
+    if (other.Intersects(getBBox()) && !(pointbased && !other.Contains(getWorldPos()))) {
       return false;
     }
   }
@@ -83,14 +57,14 @@ Vector3 CubeMesh::Intersects(Ray ray) const {
   
 
   if (getRotation().y != 0) {
-    auto relorigin = ray.origin - getPosition();
-    auto reltarget = (ray.origin + ray.dir) - getPosition();
+    auto relorigin = ray.origin - getWorldPos();
+    auto reltarget = (ray.origin + ray.dir) - getWorldPos();
     relorigin.RotateY(getRotation().y);
     reltarget.RotateY(getRotation().y);
-    ray.origin = getPosition() + relorigin;
-    ray.dir = (getPosition() + reltarget - ray.origin);
+    ray.origin = getWorldPos() + relorigin;
+    ray.dir = (getWorldPos() + reltarget - ray.origin);
   }
-  ray.origin -= getPosition();
+  ray.origin -= getWorldPos();
 
   ray.origin.z /= getScale().z / 2;
   ray.origin.y /= getScale().y / 2;
@@ -108,7 +82,7 @@ Vector3 CubeMesh::Intersects(Ray ray) const {
       hit.y *= getScale().y/2;
       hit.RotateY(-getRotation().y);
 
-      hit += getPosition();
+      hit += getWorldPos();
       if(!ret.isValid() || hit.z > ret.z) 
         ret = hit;
     }

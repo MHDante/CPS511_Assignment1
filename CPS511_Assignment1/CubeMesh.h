@@ -37,7 +37,6 @@ public:
   //Methods
   CubeMesh(Textures texture);
   void drawSelector() const;
-  BBox getBBox() const;
   virtual void drawSelf() const override;
   virtual void update(int deltaTime);
   virtual bool checkCollision(bool pointBased = false);

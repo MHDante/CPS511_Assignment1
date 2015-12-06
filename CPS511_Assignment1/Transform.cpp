@@ -12,20 +12,34 @@ void Transform::draw() const {
   glMultMatrixf(currentMatrix.get());
 
   drawSelf();
-  drawChildren();
 
   glPopMatrix();
+  drawChildren();
+
 }
 
 void Transform::updateMatrix() {
-  currentMatrix = (parent == nullptr) ? Matrix4() : parent->currentMatrix;
+  auto parentMatrix = (parent == nullptr) ? Matrix4() : parent->currentMatrix;
+  currentMatrix = Matrix4();
   currentMatrix.scale(scale);
   currentMatrix.rotateX(rotation.x);
   currentMatrix.rotateY(rotation.y);
   currentMatrix.rotateZ(rotation.z);
   currentMatrix.translate(position);
+
+  currentMatrix = parentMatrix * currentMatrix;
   for (auto& child : children) child->updateMatrix();
+  updateGeometry();
+
+
+  inverseMatrix = Matrix4(currentMatrix);
+  inverseMatrix.invert();
+
+
+
 }
+
+void Transform::updateGeometry() {}
 
 void Transform::drawSelf() const {}
 
@@ -81,10 +95,14 @@ Transform::Transform(Transform* parent)
   setParent(parent);
 }
 
-Vector3 Transform::getPosition() const {
-  return position;
+Vector3 Transform::getWorldPos() const {
+  if (parent == nullptr) return position;
+  return parent->currentMatrix * position;
 }
 
+Vector3 Transform::getLocalPos() const {
+  return position;
+}
 void Transform::setPosition(Vector3 position) {
   this->position = position;
   updateMatrix();
@@ -112,4 +130,44 @@ void Transform::setRotation(Vector3 rotation) {
 
 Transform::~Transform()
 {
+}
+
+
+// Given a cube mesh, compute it's current bounding box and return in vectors min and max
+// i.e. compute min.x,min.y,mi.z,max.x,max.y,max.z
+// Use this function for collision detection of cube and walls/floor
+BBox Transform::getBBox() const
+{
+  //could be optimized by memoization
+
+  Vector3 min = Vector3(-.5f, -.5f, -.5f);
+  Vector3 max = Vector3(.5f, .5f, .5f);
+
+  Vector3 edgePoints[8] = {
+    currentMatrix * (min),
+    currentMatrix * (min + Vector3(FORWARD)),
+    currentMatrix * (min + Vector3(RIGHT)),
+    currentMatrix * (min + Vector3(UP)),
+    currentMatrix * (max),
+    currentMatrix * (max + Vector3(BACK)),
+    currentMatrix * (max + Vector3(LEFT)),
+    currentMatrix * (max + Vector3(DOWN)) };
+
+  max.x = -INFINITY;
+  max.y = -INFINITY;
+  max.z = -INFINITY;
+  min.x = INFINITY;
+  min.y = INFINITY;
+  min.z = INFINITY;
+
+  for (auto pt : edgePoints) {
+    if (pt.x > max.x) max.x = pt.x;
+    if (pt.y > max.y) max.y = pt.y;
+    if (pt.z > max.z) max.z = pt.z;
+    if (pt.x < min.x) min.x = pt.x;
+    if (pt.y < min.y) min.y = pt.y;
+    if (pt.z < min.z) min.z = pt.z;
+  }
+  auto b = BBox(min, max);
+  return b;
 }

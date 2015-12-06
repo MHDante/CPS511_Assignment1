@@ -2,10 +2,7 @@
 #include "Game.h"
 #pragma warning(disable: 4996)
 
-void VarMesh::Draw(Material* mat) const {
-  (mat == nullptr ? material : *mat).glApply();
-
-
+void VarMesh::drawSelf() const {
   glEnableClientState(GL_VERTEX_ARRAY);
   glEnableClientState(GL_NORMAL_ARRAY);
   glEnableClientState(GL_TEXTURE_COORD_ARRAY);

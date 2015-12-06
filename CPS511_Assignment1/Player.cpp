@@ -41,7 +41,7 @@ void Player::update(int deltaTime)
 void Player::spawnBullet()
 {
 	Bullet * bullet = new Bullet();
-	bullet->setPosition(getPosition());
+	bullet->setPosition(getWorldPos());
 	Vector3 forwardDir = Vector3(0, 0, -1).GetRotatedY(-getRotation().y);
 	bullet->setVelocity(forwardDir);
 	game->bullets.push_back(bullet);
