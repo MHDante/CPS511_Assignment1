@@ -3,7 +3,7 @@
 Bullet::Bullet():CubeMesh((Textures)0)
 {
 	float r = radius * 2;
-	scale = Vector3(r, r, r);
+  setScale(Vector3(r, r, r));
 }
 
 void Bullet::setVelocity(Vector3 dir)
@@ -17,20 +17,13 @@ void Bullet::update(int deltaTime)
 	{
 		//disappear bullet
 	}
-	translate(velocity * deltaTime);
+	translate(velocity * float(deltaTime));
 }
 
-void Bullet::draw() const
+void Bullet::drawSelf() const
 {
-	glPushMatrix();
-	//glPushAttrib(GL_LIGHTING_BIT);
-	glTranslatef(position.x, position.y, position.z);
-	//glRotatef(rotation.y, 0, 1, 0);
-	glScalef(scale.x / 2, scale.y / 2, scale.z / 2);
 	Material* matptr = selected ? &highlightMaterial : &material;
 	matptr->glApply();
 	GLUquadricObj *sphereObj = gluNewQuadric();
 	gluSphere(sphereObj, 1.0, 10, 10);
-	glPopMatrix();
-	//glPopAttrib();
 }

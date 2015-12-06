@@ -20,18 +20,17 @@ Player::Player(Game*g):CubeMesh((Textures)0)
 void Player::turnPlayer(int xMouseDiff)
 {
   auto diff = xMouseDiff * mouseSensitivity;
-  rotate(Vector3(0,diff,0));
-  //std::cout << diff << std::endl;
-	//xMousePrev = xMouse;
+  rotateEulers(Vector3(0,diff,0));
 }
 
 void Player::movePlayer(float x, float y, int deltaTime)
 {
 	if (x == 0 && y == 0) return;
-	Vector3 forwardDir = Vector3(0,0,-1).GetRotatedY(-rotation.y);
-  Vector3 rightDir = Vector3(1,0,0).GetRotatedY(-rotation.y);
-  Vector3 dir = (y * forwardDir + x * rightDir) * moveSpeed * deltaTime;
-  if (!translate(dir)) translate(-dir);
+	Vector3 forwardDir = Vector3(0,0,-1).GetRotatedY(-getRotation().y);
+  Vector3 rightDir = Vector3(1,0,0).GetRotatedY(-getRotation().y);
+  Vector3 dir = (y * forwardDir + x * rightDir) * moveSpeed * float(deltaTime);
+  translate(dir);
+  if (!checkCollision(true)) translate(-dir);
 	//printf("after : %f %f %f\n", position.x, position.y, position.z);
 }
 void Player::update(int deltaTime)
@@ -42,8 +41,8 @@ void Player::update(int deltaTime)
 void Player::spawnBullet()
 {
 	Bullet * bullet = new Bullet();
-	bullet->position = position;
-	Vector3 forwardDir = Vector3(0, 0, -1).GetRotatedY(-rotation.y);
+	bullet->setPosition(getPosition());
+	Vector3 forwardDir = Vector3(0, 0, -1).GetRotatedY(-getRotation().y);
 	bullet->setVelocity(forwardDir);
 	game->bullets.push_back(bullet);
 	//printf("%d", game->bullets.size());

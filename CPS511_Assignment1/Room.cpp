@@ -4,29 +4,26 @@
 
 Room::Room(Vector3 pos, Vector3 Scale) {
 
-  position = pos;
-  scale = Scale;
+  setPosition(pos);
+  setScale(Scale);
   min = pos - Scale / 2;
   max = pos + Scale / 2;
   
-  Vector3 up = Vector3(0, max.y - min.y, 0);
-  Vector3 right = Vector3(max.x-min.x, 0, 0);
-  Vector3 forward = Vector3(0, 0, max.z - min.z);
+  Vector3 min = Vector3(-.5f,-.5f,-.5f);
+  Vector3 max = Vector3(.5f,.5f,.5f);
+
+  Vector3 up = Vector3(UP);
+  Vector3 right = Vector3(RIGHT);
+  Vector3 forward = Vector3(FORWARD);
 
   // Set up meshes
   Vector4 diffuse = Vector4(0.9f, 0.5f, 0.0f, 1);
-  floorMesh = new QuadMesh(meshSize, min, forward, right, Textures::PROFESSOR);
-  floorMesh->material.diffuse = diffuse;
-
-  diffuse = Vector4(0, 1, 0.0f, 4);
+  wallMeshes[DOWN] = new QuadMesh(meshSize, min, forward, right, Textures::PROFESSOR);
+  wallMeshes[UP] = new QuadMesh(meshSize, max, -right, -forward, Textures::PROFESSOR);
   wallMeshes[LEFT] = new QuadMesh(meshSize, min, up, forward, Textures::TILES01);
-  wallMeshes[LEFT]->material.diffuse = diffuse;
-  wallMeshes[FORWARD] = new QuadMesh(meshSize, min, right, up, Textures::TILES01);
-  wallMeshes[FORWARD]->material.diffuse = diffuse;
+  wallMeshes[BACK] = new QuadMesh(meshSize, min, right, up, Textures::TILES01);
   wallMeshes[RIGHT] = new QuadMesh(meshSize, max, -forward, -up, Textures::TILES01);
-  wallMeshes[RIGHT]->material.diffuse = diffuse;
-  wallMeshes[BACK] = new QuadMesh(meshSize, max, -up, -right, Textures::TILES01);
-  wallMeshes[BACK]->material.diffuse = diffuse;
+  wallMeshes[FORWARD] = new QuadMesh(meshSize, max, -up, -right, Textures::TILES01);
 }
 
 bool Room::Contains(BBox* box) const {
@@ -46,50 +43,32 @@ float Room::height() const { return max.y - min.y; }
 
 
 Room* Room::SpawnRoom(Direction dir) {
-  if (rooms[dir] != nullptr) return rooms[dir];
+  if (rooms[int(dir)] != nullptr) return rooms[int(dir)];
   
-  Vector3 diff = Vector3(0,0,0);
-    switch(dir) {
-    case LEFT: diff.SetX(width());    break;
-    case RIGHT: diff.SetX(-width()); break;
-    case FORWARD: diff.SetZ(depth()); break;
-    case BACK: diff.SetZ(-depth());    break;
-  }
 
     CubeMesh* wall1 = new CubeMesh(Textures::TILES01);
     CubeMesh* wall2 = new CubeMesh(Textures::TILES01);
-    auto doorWidth = 4;
+    auto doorWidth = .25;
     float ratio = randZeroToOne();
-    Vector3 leeway, start, end;
-    if (dir == LEFT || dir == RIGHT) {
-      start = center() + (Vector3(dir == LEFT ? -width() : width(), 0, -depth()) / 2);
-      end = center() + (Vector3(dir == LEFT ? -width() : width(),0,depth()) / 2);
-      leeway = Vector3(0, 0, 1) * (depth() - doorWidth);
-      wall1->scale = leeway * ratio + Vector3(.3f, height(), 0);
-      wall2->scale = leeway * (1-ratio) + Vector3(.3f, height(), 0);
+    auto pos = Vector3(dir);
+    auto unit = (dir == UP || dir == DOWN) ? Vector3(FORWARD) : Vector3(UP);
+    auto edge = (dir == FORWARD || dir == BACK) ? Vector3(RIGHT) : Vector3(FORWARD);
 
-    } else {
-      start = center() + (Vector3(-width(), 0, dir == BACK ? depth() : -depth()) / 2);
-      end = center() + (Vector3(width(), 0, dir == BACK ? depth() : -depth()) / 2);
-      leeway = Vector3(1, 0,0) * (width() - doorWidth);
-
-      wall1->scale = leeway * ratio + Vector3(0, height(), .3f);
-      wall2->scale = leeway * (1 - ratio) + Vector3(0, height(), .3f);
-    }
-    wall1->position = start + leeway*(ratio/2);
-    wall2->position = end - leeway*((1 - ratio)/2);
-    Game::instance->cubes.push_back(wall1);
-    Game::instance->cubes.push_back(wall2);
-    rooms[dir] = new Room(position - diff, scale);
-    Direction opp = Direction((dir + 2) % 4);
-    rooms[dir]->rooms[opp] = this;
-    return rooms[dir];
+    auto leeway =  (1 - doorWidth);
+    wall1->setPosition(pos/2 + edge * (-.5 + (leeway * ratio /2)));
+    wall2->setPosition(pos/2 + edge * (.5 - (leeway * (1 - ratio) /2)));
+    wall1->setScale( unit + edge * (leeway * ratio) + pos * 0.05f);
+    wall2->setScale(unit + edge * (leeway * (1 - ratio)) + pos * 0.05f);
+    addChild(wall1);
+    addChild(wall2);
+    rooms[int(dir)] = new Room(getPosition() + pos.ElementWiseProduct(getScale()), getScale());
+    rooms[int(dir)]->rooms[int(Opposite(dir))] = this;
+    return rooms[int(dir)];
 }
 
-void Room::Draw() const {
+void Room::drawSelf() const {
   // Draw floor and wall meshes
-  floorMesh->DrawMesh();
-  for (int i = 0; i < 4; i++)
+  for (int i = 0; i < 6; i++)
   {
     if(rooms[i] == nullptr)
       wallMeshes[i]->DrawMesh();

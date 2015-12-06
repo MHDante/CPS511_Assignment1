@@ -12,6 +12,13 @@
 
 enum class Textures { TILES01, PROFESSOR, MEGAMAN, BOT };
 
+enum Direction { RIGHT, UP, FORWARD, LEFT, DOWN, BACK, };
+
+inline Direction Opposite(Direction dir) {
+  return Direction((int(dir) + 3) % 6);
+}
+
+
 inline std::string floatToSmallString(float f, int precision = 2) {
   std::stringstream ss;
   ss << std::fixed << std::setprecision(precision) << f;
@@ -85,6 +92,16 @@ public:
   explicit Vector3(const float * rhs) : x(*rhs), y(*(rhs + 1)), z(*(rhs + 2))
   {}
 
+  explicit Vector3(Direction dir) {
+    switch (dir) {
+    case LEFT:    *this = Vector3(-1, 0, 0);  break;
+    case RIGHT:   *this = Vector3(1, 0, 0);   break;
+    case UP:      *this = Vector3(0, 1, 0);   break;
+    case DOWN:    *this = Vector3(0, -1, 0);  break;
+    case FORWARD: *this = Vector3(0, 0, 1);   break;
+    case BACK:    *this = Vector3(0, 0, -1);  break;
+    }
+	}
 	Vector3(const Vector3 & rhs)	:	x(rhs.x), y(rhs.y), z(rhs.z)
 	{}
 
@@ -108,12 +125,14 @@ public:
 	void LoadOne(void)
 	{	x=y=z=1.0f;	}
 
+
   Vector3 ElementWiseProduct(Vector3 o) const {
     return Vector3(x*o.x, y *o.y, z*o.z);
 	}
 
   static Vector3 Sentinel() { return Vector3(NAN, NAN, NAN); }
-
+  static Vector3 Zero()     { return Vector3(0,0,0); }
+  static Vector3 One()      { return Vector3(1,1,1); }
 	//vector algebra
 	Vector3 CrossProduct(const Vector3 & rhs) const
 	{	return Vector3(y*rhs.z - z*rhs.y, z*rhs.x - x*rhs.z, x*rhs.y - y*rhs.x);	}
