@@ -48,11 +48,29 @@ void Robot::update(int deltaTime)
 		translate(-v);
 		setRandDirection();
 	}
+  
+  if (shotCooldown)
+  {
+    shotTimer += deltaTime;
+    if (shotTimer >= shotTimerMax)
+    {
+      shotTimer = 0;
+      shotCooldown = false;
+    }
+  }
+  Room * playerRoom = Game::instance->roomAt(Game::instance->player->getPosition());
+  Room * room = Game::instance->roomAt(getPosition());
+  if (playerRoom == room && !shotCooldown)
+  {
+    spawnBullet();
+    shotCooldown = true;
+  }
 }
 bool Robot::checkCollision(bool pointBased)
 {
 	for (auto& bullet : Game::instance->bullets) {
 		BBox other = bullet->getBBox();
+    if (!bullet->shotByPlayer) continue;
 		if (other.Intersects(getBBox()) && !(pointBased && !other.Contains(getPosition()))) {
       bullet->flaggedForRemoval = true;
 			if (--health <= 0)
@@ -79,8 +97,11 @@ bool Robot::checkCollision(bool pointBased)
 void Robot::spawnBullet()
 {
 	Bullet * bullet = new Bullet();
+  bullet->shotByPlayer = false;
+  bullet->moveSpeed /= 3.0f;
 	bullet->setPosition(getPosition());
-	Vector3 forwardDir = Vector3(0, 0, -1).GetRotatedY(-getRotation().y);
+  Vector3 forwardDir = Game::instance->player->getPosition() - getPosition();
+  forwardDir.Normalize();
 	bullet->setVelocity(forwardDir);
 	game->bullets.push_back(bullet);
 }

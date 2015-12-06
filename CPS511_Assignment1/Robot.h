@@ -15,6 +15,8 @@ public:
 	float moveSpeed;
 	Vector3 velocity;
 	int health;
+  int shotTimer = 0, shotTimerMax = 1000;
+  bool shotCooldown = false;
 	explicit Robot(Game * game);
 	void setVelocity(Vector3 dir);
 	void setRandDirection();

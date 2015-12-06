@@ -20,7 +20,7 @@ Game::Game()
 }
 
 void Game::setUpScene() {
-  rooms.push_back(new Room(Vector3(0,0,0), Vector3(16,4,16)));
+  rooms.push_back(new Room(Vector3(0,0,0), Vector3(32,4,32)));
   rooms.push_back(rooms[0]->SpawnRoom(LEFT));
   rooms.push_back(rooms[1]->SpawnRoom(FORWARD));
   rooms.push_back(rooms[1]->SpawnRoom(BACK));
@@ -43,13 +43,6 @@ void Game::setUpScene() {
 
 	loadTextures();
 }
-void drawString(void * font, char *s, float x, float y, float z) {
-  unsigned int i;
-  glRasterPos3f(x, y, z);
-
-  for (i = 0; i < strlen(s); i++)
-    glutBitmapCharacter(font, s[i]);
-}
 
 void Game::display(void)
 {
@@ -68,7 +61,7 @@ void Game::display(void)
 	player->draw();
 
   char buff[40];
-  snprintf(buff, sizeof(buff), "Kills: %d  Remaining: %d", kills, robots.size());
+  snprintf(buff, sizeof(buff), "Kills: %d  Remaining: %d Health: %d", kills, robots.size(), player->health);
   drawText(buff, 40, 10, 10);
 
 	glutSwapBuffers();
