@@ -130,6 +130,7 @@
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GLApp.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Matrices.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="QuadMesh.cpp" />
     <ClCompile Include="CubeMesh.cpp" />
@@ -145,6 +146,7 @@
     <ClInclude Include="CubeMesh.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GLApp.h" />
+    <ClInclude Include="Matrices.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="QuadMesh.h" />
     <ClInclude Include="GLUtils.h" />

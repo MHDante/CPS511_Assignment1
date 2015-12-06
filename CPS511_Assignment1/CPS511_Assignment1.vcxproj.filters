@@ -55,6 +55,9 @@
     <ClCompile Include="VarMesh.cpp">
       <Filter>Source Files\Objects</Filter>
     </ClCompile>
+    <ClCompile Include="Matrices.cpp">
+      <Filter>Source Files\Utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GLUtils.h">
@@ -95,6 +98,9 @@
     </ClInclude>
     <ClInclude Include="VarMesh.h">
       <Filter>Source Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Matrices.h">
+      <Filter>Source Files\Utils</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

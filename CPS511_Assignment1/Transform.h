@@ -1,6 +1,7 @@
 #pragma once
 #include "GLUtils.h"
 #include <set>
+#include "Matrices.h"
 
 class Transform
 {
@@ -11,34 +12,14 @@ private:
   Vector3 scale = Vector3(1, 1, 1);
   Vector3 rotation = Vector3(0, 0, 0);
 
-public:
-  Vector3 getPosition() const {
-    return position;
-  }
-
-  void setPosition(Vector3 position) {
-    this->position = position;
-  }
-
-  Vector3 getScale() const {
-    return scale;
-  }
-
-  void setScale(Vector3 scale) {
-    this->scale = scale;
-  }
-
-  Vector3 getRotation() const {
-    return rotation;
-  }
-
-  void setRotation(Vector3 rotation) {
-    this->rotation = rotation;
-  }
 protected:
+  Matrix4 currentMatrix;
+
+  virtual void updateMatrix();
   virtual void drawSelf() const;
   virtual void drawChildren() const;
 public:
+
   Transform* getParent() const{ return parent;}
   virtual void draw() const;
   void translate(Vector3 diff);
@@ -49,6 +30,12 @@ public:
   std::set<Transform*> children;
   Transform();
   explicit Transform(Transform* parent);
+  Vector3 getPosition() const;
+  void setPosition(Vector3 position);
+  Vector3 getScale() const;
+  void setScale(Vector3 scale);
+  Vector3 getRotation() const;
+  void setRotation(Vector3 rotation);
   virtual ~Transform();
 };
 
