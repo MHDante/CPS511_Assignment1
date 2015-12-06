@@ -10,7 +10,7 @@
 # define M_PIl 3.14159265358979323846f
 #define DEG2RAD (M_PIl / 180)
 
-enum class Textures { TILES01, PROFESSOR, MEGAMAN };
+enum class Textures { TILES01, PROFESSOR, MEGAMAN, BOT };
 
 inline std::string floatToSmallString(float f, int precision = 2) {
   std::stringstream ss;

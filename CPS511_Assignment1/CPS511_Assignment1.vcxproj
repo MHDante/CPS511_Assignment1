@@ -134,6 +134,7 @@
     <ClCompile Include="QuadMesh.cpp" />
     <ClCompile Include="CubeMesh.cpp" />
     <ClCompile Include="RGBpixmap.cpp" />
+    <ClCompile Include="Robot.cpp" />
     <ClCompile Include="Room.cpp" />
     <ClCompile Include="Transform.cpp" />
     <ClCompile Include="VarMesh.cpp" />
@@ -148,6 +149,7 @@
     <ClInclude Include="QuadMesh.h" />
     <ClInclude Include="GLUtils.h" />
     <ClInclude Include="RGBpixmap.h" />
+    <ClInclude Include="Robot.h" />
     <ClInclude Include="Room.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="VarMesh.h" />

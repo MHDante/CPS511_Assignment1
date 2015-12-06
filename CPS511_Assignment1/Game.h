@@ -20,6 +20,7 @@
 
 #include "Room.h"
 #include "VarMesh.h"
+#include "Robot.h"
 
 class Game : public GLApp
 {
@@ -29,14 +30,16 @@ public:
   
 	std::vector<CubeMesh*> cubes;
 	std::vector<Bullet*> bullets;
+	std::vector<Robot*> robots;
 	std::map<Textures, GLuint> textureMap;
 	std::map<Textures, RGBpixmap> pixmaps;
 	Player * player;
 	Vector3 rightLeft, upDown;
 	int centerX;
 	int centerY;
+	int previousTime = 0, spawnTimer = 0, spawnTimerMax = 2000, spawnTimerMaxRand = 0;
   VarMesh* cube;
-  Game();
+	Game();
 	void setUpScene() override;
 	void display() override;
 	void mouse(int button, int state, int x, int y) override;
@@ -46,10 +49,12 @@ public:
 	void keyboardRelease(unsigned char key, int x, int y) override;
 	void UpdateConsole() override;
 	void idleFunc() override;
+	void spawnEnemy();
 	void loadTextures();
 	void loadTexture(const char * filename, Textures tex);
 
 	void recenterMouse();
+	Room* roomAt(Vector3 center);
 
   std::vector<Room*> rooms;
 	std::vector<Line> lines;

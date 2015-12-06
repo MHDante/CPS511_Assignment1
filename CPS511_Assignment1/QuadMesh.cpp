@@ -44,8 +44,7 @@ QuadMesh::QuadMesh(int meshSize, Vector3 origin, Vector3 length, Vector3 width, 
       quads[currentQuad++] = (j + 1) * (meshSize + 1) + k;
     }
   }
-  glEnableClientState(GL_VERTEX_ARRAY);
-  glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
 }
 
 QuadMesh::~QuadMesh() {
@@ -55,13 +54,18 @@ QuadMesh::~QuadMesh() {
 
 void QuadMesh::DrawMesh(Material* mat) const {
   (mat == nullptr?material:*mat).glApply();
-  
+  glEnableClientState(GL_VERTEX_ARRAY);
+  glEnableClientState(GL_TEXTURE_COORD_ARRAY);
   glBindTexture(GL_TEXTURE_2D, Game::instance->textureMap[texture]);
 
   glNormal3f(normal.x, normal.y, normal.z);
   glVertexPointer(3, GL_FLOAT, sizeof(Vector3), vertices);
   glTexCoordPointer(2, GL_FLOAT, sizeof(GLfloat) * 2, texcoords);
   glDrawElements(GL_QUADS, numQuads * 4, GL_UNSIGNED_INT, quads);
+
+
+  glDisableClientState(GL_VERTEX_ARRAY);
+  glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 }
 
 Vector3 QuadMesh::intersectsRay(Ray r) const {

@@ -24,7 +24,9 @@ void VarMesh::Draw(Material* mat) const {
   glNormalPointer(GL_FLOAT, sizeof(Vector3), uvs.data());
   //glDrawElements(GL_TRIANGLES, vertexIndices.size(), GL_UNSIGNED_INT, vertexIndices.data());
   glDrawArrays(GL_TRIANGLES, 0, vertices.size());
-
+  glDisableClientState(GL_VERTEX_ARRAY);
+  glDisableClientState(GL_NORMAL_ARRAY);
+  glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 }
 bool VarMesh::loadOBJ(const char* path) {
 

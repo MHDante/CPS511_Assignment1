@@ -1,5 +1,6 @@
 ﻿#include "Game.h"
 #include "Camera.h"
+#include "GLUtils.h"
 #include <iostream>
 #include <thread>
 #include "VarMesh.h"
@@ -57,12 +58,13 @@ void Game::display(void)
 	// Set up the camera
 	mainCamera->display();
 	// Draw all cubes (see CubeMesh.h)
-  for (auto& c : cubes) c->drawCube();
-  for (auto& r : rooms) r->Draw();
-  for (auto& l : lines) l.Draw();
-  for (auto& b : bullets)b->display();
+    for (auto& c : cubes) c->draw();
+    for (auto& r : rooms) r->Draw();
+    for (auto& l : lines) l.Draw();
+    for (auto& b : bullets)b->draw();
+    for (auto& b : robots)b->draw();
 
-	player->drawCube();
+	player->draw();
   cube->Draw();
 
 	glutSwapBuffers();
@@ -183,15 +185,43 @@ void Game::keyboardRelease(unsigned char key, int x, int y)
 
 void Game::idleFunc()
 {
+	int newTime = glutGet(GLUT_ELAPSED_TIME);
+	int deltaTime = newTime - previousTime;
+	previousTime = newTime;
 	//printf("%f %f\n", rightLeft.x + rightLeft.y, upDown.x + upDown.y);
-	player->movePlayer(rightLeft.x + rightLeft.y, upDown.x + upDown.y);
+	player->movePlayer(rightLeft.x + rightLeft.y, upDown.x + upDown.y, deltaTime);
 	for(auto& b : bullets)
 	{
-		b->update();
+		b->update(deltaTime);
 	}
+	for (auto& r : robots)
+	{
+		r->update(deltaTime);
+	}
+	spawnTimer += deltaTime;
+	if (spawnTimer >= spawnTimerMaxRand)
+	{
+		spawnTimer = 0;
+		int fourthMax = (spawnTimerMax / 4);
+		int range = rand() % fourthMax - fourthMax / 2;
+		spawnTimerMaxRand = spawnTimerMax + range;
+		spawnEnemy();
+	}
+
+	
 	glutPostRedisplay();
 }
+void Game::spawnEnemy()
+{
+	int roomIndex = rand() % rooms.size();
+	Room * r = rooms[roomIndex];
+	Robot * robot = new Robot(this);
+	robot->center = (r->max - r->min) * (randZeroToOne() * 0.6 + 0.2) + r->min;
+	robot->center.y = r->min.y + r->max.y / 2;
+	robot->setRandDirection();
+	robots.push_back(robot);
 
+}
 void Game::recenterMouse()
 {
 	glutWarpPointer(centerX, centerY);
@@ -200,8 +230,9 @@ void Game::recenterMouse()
 void Game::loadTextures()
 {
 	loadTexture("tiles01.bmp", Textures::TILES01);
-  loadTexture("professor.bmp", Textures::PROFESSOR);
+	loadTexture("professor.bmp", Textures::PROFESSOR);
   loadTexture("megaman.bmp", Textures::MEGAMAN);
+	loadTexture("robot.bmp", Textures::BOT);
 }
 void Game::loadTexture(const char * filename, Textures tex)
 {
@@ -230,4 +261,11 @@ void Game::loadTexture(const char * filename, Textures tex)
 		pixmaps[tex].pixel); // the pixels
 
 
+}
+
+Room* Game::roomAt(Vector3 center) {
+	for (auto& r : rooms) {
+		if (r != nullptr && r->Contains(center)) return r;
+	}
+	return nullptr;
 }
