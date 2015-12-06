@@ -10,7 +10,7 @@
 # define M_PIl 3.14159265358979323846f
 #define DEG2RAD (M_PIl / 180)
 
-enum class Textures { TILES01, PROFESSOR };
+enum class Textures { TILES01, PROFESSOR, MEGAMAN };
 
 inline std::string floatToSmallString(float f, int precision = 2) {
   std::stringstream ss;
@@ -22,6 +22,14 @@ struct Vector4 {
   float x; float y; float z;  float w;
   Vector4() :x(0), y(0), z(0), w(0) {};
   Vector4(float x, float y, float z, float w) :x(x), y(y), z(z), w(w) {};
+
+  operator float* () const { return (float*) this; }
+  operator const float* () const { return (const float*) this; }
+};
+struct Vector2 {
+  float x; float y;
+  Vector2() :x(0), y(0){};
+  Vector2(float x, float y) :x(x), y(y){};
 
   operator float* () const { return (float*) this; }
   operator const float* () const { return (const float*) this; }

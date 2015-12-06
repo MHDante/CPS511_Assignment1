@@ -2,6 +2,7 @@
 #include "Camera.h"
 #include <iostream>
 #include <thread>
+#include "VarMesh.h"
 
 Game* Game::instance = nullptr;
 //=******************************************************************
@@ -37,6 +38,8 @@ void Game::setUpScene() {
 	player = new Player(this);
 	
 	player->center = Vector3(0.0, 2.0, 0.0);
+  cube = new VarMesh();
+  cube->loadOBJ("megaman.obj");
 
 	recenterMouse();
 	player->turnPlayer(0);
@@ -54,16 +57,13 @@ void Game::display(void)
 	// Set up the camera
 	mainCamera->display();
 	// Draw all cubes (see CubeMesh.h)
-    for (auto& c : cubes) c->drawCube();
-    for (auto& r : rooms) r->Draw();
-    for (auto& l : lines) l.Draw();
+  for (auto& c : cubes) c->drawCube();
+  for (auto& r : rooms) r->Draw();
+  for (auto& l : lines) l.Draw();
+  for (auto& b : bullets)b->display();
 
 	player->drawCube();
-
-	for (auto& b : bullets)
-	{
-		b->display();
-	}
+  cube->Draw();
 
 	glutSwapBuffers();
 }
@@ -200,7 +200,8 @@ void Game::recenterMouse()
 void Game::loadTextures()
 {
 	loadTexture("tiles01.bmp", Textures::TILES01);
-	loadTexture("professor.bmp", Textures::PROFESSOR);
+  loadTexture("professor.bmp", Textures::PROFESSOR);
+  loadTexture("megaman.bmp", Textures::MEGAMAN);
 }
 void Game::loadTexture(const char * filename, Textures tex)
 {

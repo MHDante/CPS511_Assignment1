@@ -3,7 +3,6 @@
 #define PLAYER
 
 #include "CubeMesh.h"
-#include "Camera.h"
 #include "Bullet.h"
 
 class Game;

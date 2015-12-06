@@ -19,6 +19,7 @@
 #include "RGBpixmap.h"
 
 #include "Room.h"
+#include "VarMesh.h"
 
 class Game : public GLApp
 {
@@ -34,7 +35,8 @@ public:
 	Vector3 rightLeft, upDown;
 	int centerX;
 	int centerY;
-	Game();
+  VarMesh* cube;
+  Game();
 	void setUpScene() override;
 	void display() override;
 	void mouse(int button, int state, int x, int y) override;

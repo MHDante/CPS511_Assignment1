@@ -136,6 +136,7 @@
     <ClCompile Include="RGBpixmap.cpp" />
     <ClCompile Include="Room.cpp" />
     <ClCompile Include="Transform.cpp" />
+    <ClCompile Include="VarMesh.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bullet.h" />
@@ -149,6 +150,7 @@
     <ClInclude Include="RGBpixmap.h" />
     <ClInclude Include="Room.h" />
     <ClInclude Include="Transform.h" />
+    <ClInclude Include="VarMesh.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
