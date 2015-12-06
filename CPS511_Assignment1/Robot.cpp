@@ -6,6 +6,7 @@ Robot::Robot(Game*g) :CubeMesh(Textures::BOT)
 {
 	this->game = g;
 	moveSpeed = 0.01f;
+  health = 1;
 	/*
 	auto dante = false;
 	if (dante) {
@@ -39,14 +40,14 @@ bool Robot::checkCollision(bool pointBased)
 		if (other.Intersects(getBBox()) && !(pointBased && !other.Contains(position))) {
 			printf("HIT");
 			///AAARRGGGG
-
-			Game::instance->bullets.erase(std::remove(Game::instance->bullets.begin(), Game::instance->bullets.end(), bullet), Game::instance->bullets.end());
-			
-			delete(bullet); 
+			//Game::instance->bullets.erase(std::remove(Game::instance->bullets.begin(), Game::instance->bullets.end(), bullet), Game::instance->bullets.end());
+			//delete(bullet); 
+      bullet->flaggedForRemoval = true;
 			if (--health <= 0)
 			{
-				Game::instance->robots.erase(std::remove(Game::instance->robots.begin(), Game::instance->robots.end(), this), Game::instance->robots.end());
-				delete(this);
+				//Game::instance->robots.erase(std::remove(Game::instance->robots.begin(), Game::instance->robots.end(), this), Game::instance->robots.end());
+				//delete(this);
+        flaggedForRemoval = true;
 				return true;
 			}
 			break;

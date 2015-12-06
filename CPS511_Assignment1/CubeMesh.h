@@ -31,6 +31,7 @@ public:
 
 	bool selected;
   bool hovered;
+  bool flaggedForRemoval;
   static Material material; // Material properties for drawing
   static Material highlightMaterial;	// Material properties if selected
   Textures texture;

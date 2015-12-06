@@ -197,6 +197,23 @@ void Game::idleFunc()
 	{
 		r->update(deltaTime);
 	}
+  bullets.erase(
+    std::remove_if(bullets.begin(), bullets.end(),
+      [](Bullet* element) -> bool {
+      //return true if element should be removed.
+    bool remove = element->flaggedForRemoval;
+    if (remove) free(element);
+        return remove;
+      } ), bullets.end() );
+  robots.erase(
+    std::remove_if(robots.begin(), robots.end(),
+      [](Robot* element) -> bool {
+    //return true if element should be removed.
+    bool remove = element->flaggedForRemoval;
+    if (remove) free(element);
+    return remove;
+  }), robots.end());
+
 	spawnTimer += deltaTime;
 	if (spawnTimer >= spawnTimerMaxRand)
 	{
