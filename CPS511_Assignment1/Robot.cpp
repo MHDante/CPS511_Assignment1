@@ -26,8 +26,9 @@ void Robot::setRandDirection()
 }
 void Robot::update(int deltaTime)
 {
-	Vector3 v = velocity * deltaTime;
-	if (!translate(v))
+	Vector3 v = velocity * float(deltaTime);
+  translate(v);
+	if (!checkCollision())
 	{
 		translate(-v);
 		setRandDirection();
@@ -37,7 +38,7 @@ bool Robot::checkCollision(bool pointBased)
 {
 	for (auto& bullet : Game::instance->bullets) {
 		BBox other = bullet->getBBox();
-		if (other.Intersects(getBBox()) && !(pointBased && !other.Contains(position))) {
+		if (other.Intersects(getBBox()) && !(pointBased && !other.Contains(getPosition()))) {
 			printf("HIT");
 			///AAARRGGGG
 			//Game::instance->bullets.erase(std::remove(Game::instance->bullets.begin(), Game::instance->bullets.end(), bullet), Game::instance->bullets.end());
@@ -57,7 +58,7 @@ bool Robot::checkCollision(bool pointBased)
 
 	for (auto& robot : Game::instance->robots) {
 		BBox other = robot->getBBox();
-		if (robot != this && other.Intersects(getBBox()) && !(pointBased && !other.Contains(position))) {
+		if (robot != this && other.Intersects(getBBox()) && !(pointBased && !other.Contains(getPosition()))) {
 			return false;
 		}
 	}
@@ -69,8 +70,8 @@ bool Robot::checkCollision(bool pointBased)
 void Robot::spawnBullet()
 {
 	Bullet * bullet = new Bullet();
-	bullet->position = position;
-	Vector3 forwardDir = Vector3(0, 0, -1).GetRotatedY(-rotation.y);
+	bullet->setPosition(getPosition());
+	Vector3 forwardDir = Vector3(0, 0, -1).GetRotatedY(-getRotation().y);
 	bullet->setVelocity(forwardDir);
 	game->bullets.push_back(bullet);
 	//printf("%d", game->bullets.size());

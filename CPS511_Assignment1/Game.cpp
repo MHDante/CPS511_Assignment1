@@ -12,40 +12,35 @@ Game* Game::instance = nullptr;
 Game::Game()
 {
   instance = this;
-  ScreenWidth = 1000;
+  ScreenWidth = 1500;
   ScreenHeight = 800;
 	windowName = "Scene Game";
-	//centerX = glutGet(GLUT_WINDOW_X) + glutGet(GLUT_WINDOW_WIDTH) / 2;
-	//centerY = glutGet(GLUT_WINDOW_Y) + glutGet(GLUT_WINDOW_HEIGHT) / 2;
 	centerX = ScreenWidth / 2;
 	centerY = ScreenHeight / 2;
 }
 
 void Game::setUpScene() {
-  rooms.push_back(new Room(Vector3(0,0,0), Vector3(16,8,16)));
-  rooms.push_back(rooms[0]->SpawnRoom(Room::LEFT));
-  rooms.push_back(rooms[1]->SpawnRoom(Room::FORWARD));
-  rooms.push_back(rooms[1]->SpawnRoom(Room::BACK));
-  rooms.push_back(rooms[3]->SpawnRoom(Room::BACK));
-
-	mainCamera->pos = Vector3(0.0, 12.0, 22.0);
-	mainCamera->target = Vector3(0.0, 0.0, 0.0);
-	mainCamera->up = Vector3(0.0, 1.0, 0.0);
-	mainCamera->fovY = 60.0;
-	mainCamera->aspect = 1.0;
-	mainCamera->nearZ = 1.0f;
-	mainCamera->farZ = 100;
+  rooms.push_back(new Room(Vector3(0,0,0), Vector3(16,4,16)));
+  rooms.push_back(rooms[0]->SpawnRoom(LEFT));
+  rooms.push_back(rooms[1]->SpawnRoom(FORWARD));
+  rooms.push_back(rooms[1]->SpawnRoom(BACK));
+  rooms.push_back(rooms[3]->SpawnRoom(BACK));
 
 	player = new Player(this);
-	
-	player->position = Vector3(0.0, 0, 0.0);
+  player->setPosition(Vector3(0.0, 0, 0.0));
+  player->turnPlayer(0);
+
+  mainCamera->fovY = 60.0f;
+  mainCamera->nearZ = 1.0f;
+  mainCamera->farZ = 100;
+  mainCamera->Follow(player);
+
   cube = new VarMesh("megaman.obj");
 
 	recenterMouse();
-	player->turnPlayer(0);
-	mainCamera->Follow(player);
 	glutSetCursor(GLUT_CURSOR_NONE);
-	glEnable(GL_TEXTURE_2D);
+
+
 	loadTextures();
 }
 
@@ -58,7 +53,7 @@ void Game::display(void)
 	mainCamera->display();
 	// Draw all cubes (see CubeMesh.h)
   for (auto& c : cubes) c->draw();
-  for (auto& r : rooms) r->Draw();
+  for (auto& r : rooms) r->draw();
   for (auto& l : lines) l.Draw();
   for (auto& b : bullets)b->draw();
   for (auto& b : robots)b->draw();
@@ -232,8 +227,9 @@ void Game::spawnEnemy()
 	int roomIndex = rand() % rooms.size();
 	Room * r = rooms[roomIndex];
 	Robot * robot = new Robot(this);
-	robot->position = (r->max - r->min) * (randZeroToOne() * 0.6 + 0.2) + r->min;
-	robot->position.y = (r->min.y + r->max.y) / 2;
+  auto v = (r->max - r->min) * (randZeroToOne() * 0.6f + 0.2f) + r->min;
+  v.y = (r->min.y + r->max.y) / 2;
+	robot->setPosition(v);
 	robot->setRandDirection();
 	robots.push_back(robot);
 
@@ -245,6 +241,7 @@ void Game::recenterMouse()
 
 void Game::loadTextures()
 {
+  glEnable(GL_TEXTURE_2D);
 	loadTexture("tiles01.bmp", Textures::TILES01);
 	loadTexture("professor.bmp", Textures::PROFESSOR);
   loadTexture("megaman.bmp", Textures::MEGAMAN);

@@ -39,13 +39,9 @@ public:
   CubeMesh(Textures texture);
   void drawSelector() const;
   BBox getBBox() const;
-  virtual void draw() const;
+  virtual void drawSelf() const override;
   virtual void update(int deltaTime);
-  bool translate(Vector3 diff);
   virtual bool checkCollision(bool pointBased = false);
-  bool rotateEulers(Vector3 rot);
-  bool Scale(Vector3 diff);
-  bool rotate(Vector3 diff);
   bool extrude(Vector3 diff);
   bool raise(Vector3 diff);
   Vector3 Intersects(Ray ray) const;

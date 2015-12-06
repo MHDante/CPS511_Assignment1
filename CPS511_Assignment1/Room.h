@@ -9,11 +9,9 @@ class Room : public Transform, public BBox{
 public:
   using BBox::Contains;
   BBox bounds;
-  enum Direction { LEFT, FORWARD, RIGHT, BACK };
   int meshSize = 16;
-  QuadMesh *floorMesh = nullptr;
-  QuadMesh *wallMeshes[4];
-  Room* rooms[4] = { nullptr,nullptr,nullptr,nullptr };
+  QuadMesh *wallMeshes[6];
+  Room* rooms[6] = { nullptr,nullptr,nullptr,nullptr, nullptr, nullptr };
   Room(Vector3 pos, Vector3 scale);
   ~Room() {}
   virtual bool Contains(BBox* box) const override;
@@ -21,7 +19,7 @@ public:
   float depth() const;
   float height() const;
   Room* SpawnRoom(Direction dir);
-  void Draw() const;
+  void drawSelf() const override;
 
 };
 #endif
