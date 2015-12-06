@@ -36,7 +36,18 @@ void Player::movePlayer(float x, float y, int deltaTime)
 }
 void Player::update(int deltaTime)
 {
-
+  for (auto& bullet : Game::instance->bullets) {
+    BBox other = bullet->getBBox();
+    if (bullet->shotByPlayer) continue;
+    if (getBBox().Contains(bullet->getWorldPos())) {//if (other.Intersects(getBBox())){// && !(pointBased && !other.Contains(getWorldPos()))) {
+      bullet->flaggedForRemoval = true;
+      if (--health <= 0)
+      {
+        //game over
+        //return true;
+      }
+    }
+  }
 }
 
 void Player::spawnBullet()
@@ -53,25 +64,5 @@ void Player::draw() const {
 }
 bool Player::checkCollision(bool pointBased)
 {
-  for (auto& bullet : Game::instance->bullets) {
-    BBox other = bullet->getBBox();
-    if (bullet->shotByPlayer) continue;
-    if (other.Intersects(getBBox()) && !(pointBased && !other.Contains(getWorldPos()))) {
-      bullet->flaggedForRemoval = true;
-      if (--health <= 0)
-      {
-        //game over
-        //return true;
-      }
-    }
-  }
-  /*
-  for (auto& robot : Game::instance->robots) {
-    BBox other = robot->getBBox();
-    if (other.Intersects(getBBox()) && !(pointBased && !other.Contains(getPosition()))) {
-      return false;
-    }
-  }
-  */
   return CubeMesh::checkCollision(pointBased);
 }

@@ -37,8 +37,10 @@ public:
 	Vector3 rightLeft, upDown;
 	int centerX;
 	int centerY;
-	int previousTime = 0, spawnTimer = 0, spawnTimerMax = 2000, spawnTimerMaxRand = 0;
+	int previousTime = 0, spawnTimer = 0, spawnTimerMax = 5000, spawnTimerMaxRand = 0;
   int kills = 0;
+  int initialEnemies = 1;
+  bool wonGame = false;
   VarMesh* mesh;
 	Game();
 	void setUpScene() override;

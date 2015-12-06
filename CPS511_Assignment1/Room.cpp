@@ -16,8 +16,8 @@ Room::Room(Vector3 pos, Vector3 Scale) {
 
   // Set up meshes
   Vector4 diffuse = Vector4(0.9f, 0.5f, 0.0f, 1);
-  wallMeshes[DOWN] = new QuadMesh(meshSize, min, forward, right, Textures::PROFESSOR);
-  wallMeshes[UP] = new QuadMesh(meshSize, max, -right, -forward, Textures::PROFESSOR);
+  wallMeshes[DOWN] = new QuadMesh(meshSize, min, forward, right, Textures::PLANK);
+  wallMeshes[UP] = new QuadMesh(meshSize, max, -right, -forward, Textures::CLOVER);
   wallMeshes[LEFT] = new QuadMesh(meshSize, min, up, forward, Textures::TILES01);
   wallMeshes[BACK] = new QuadMesh(meshSize, min, right, up, Textures::TILES01);
   wallMeshes[RIGHT] = new QuadMesh(meshSize, max, -forward, -up, Textures::TILES01);

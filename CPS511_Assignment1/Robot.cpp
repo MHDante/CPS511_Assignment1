@@ -37,7 +37,7 @@ void Robot::setRandDirection()
 {
 	int randAngle = rand() % 360;
 	setVelocity(Vector3(1, 0, 0).GetRotatedY(randAngle));
-  botTransform.setRotation(Vector3(0, -randAngle+90, 0));
+  setRotation(Vector3(0, -randAngle+90, 0));
 }
 void Robot::update(int deltaTime)
 {
@@ -60,10 +60,16 @@ void Robot::update(int deltaTime)
   }
   Room * playerRoom = Game::instance->roomAt(Game::instance->player->getWorldPos());
   Room * room = Game::instance->roomAt(getWorldPos());
-  if (playerRoom == room && !shotCooldown)
+  if (playerRoom == room)
   {
-    spawnBullet();
-    shotCooldown = true;
+    Vector3 dir = Game::instance->player->getWorldPos() - getWorldPos();
+    float ang = atan2f(dir.z, dir.x);
+    ang *= (1.0f / DEG2RAD);
+    setRotation(Vector3(0, -ang + 90, 0));
+    if (!shotCooldown) {
+      spawnBullet();
+      shotCooldown = true;
+    }
   }
 }
 bool Robot::checkCollision(bool pointBased)
@@ -105,12 +111,6 @@ void Robot::spawnBullet()
 	bullet->setVelocity(forwardDir);
 	game->bullets.push_back(bullet);
 }
-//void Robot::drawSelf() const {
-//	//CubeMesh::draw();
-//  //varMesh->Draw();
-//  Game::instance->mesh->Draw();
-//}
-
 void Robot::drawSelf() const
 {
   Game::instance->mesh->draw();

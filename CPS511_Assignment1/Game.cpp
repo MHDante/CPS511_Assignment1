@@ -44,8 +44,12 @@ void Game::setUpScene() {
 
 
 	loadTextures();
-}
 
+  for (int i = 0; i < initialEnemies; i++)
+  {
+    spawnEnemy();
+  }
+}
 void Game::display(void)
 {
 
@@ -65,6 +69,15 @@ void Game::display(void)
   char buff[40];
   snprintf(buff, sizeof(buff), "Kills: %d  Remaining: %d Health: %d", kills, robots.size(), player->health);
   drawText(buff, 40, 10, 10);
+
+  if (wonGame)
+  {
+    for (auto& r : rooms)
+    {
+      Vector3 worldpos = r->getWorldPos();
+      drawText("YOU WIN!", 8, 150, 100);
+    }
+  }
 
 	glutSwapBuffers();
 }
@@ -190,6 +203,7 @@ void Game::idleFunc()
 	previousTime = newTime;
 	//printf("%f %f\n", rightLeft.x + rightLeft.y, upDown.x + upDown.y);
 	player->movePlayer(rightLeft.x + rightLeft.y, upDown.x + upDown.y, deltaTime);
+  player->update(deltaTime);
 	for(auto& b : bullets)
 	{
 		b->update(deltaTime);
@@ -215,15 +229,21 @@ void Game::idleFunc()
     return remove;
   }), robots.end());
 
-	spawnTimer += deltaTime;
-	if (spawnTimer >= spawnTimerMaxRand)
-	{
-		spawnTimer = 0;
-		int fourthMax = (spawnTimerMax / 4);
-		int range = rand() % fourthMax - fourthMax / 2;
-		spawnTimerMaxRand = spawnTimerMax + range;
-		spawnEnemy();
-	}
+  if (robots.size() == 0)
+  {
+    wonGame = true;
+  }
+  if (!wonGame) {
+    spawnTimer += deltaTime;
+    if (spawnTimer >= spawnTimerMaxRand)
+    {
+      spawnTimer = 0;
+      int fourthMax = (spawnTimerMax / 4);
+      int range = rand() % fourthMax - fourthMax / 2;
+      spawnTimerMaxRand = spawnTimerMax + range;
+      spawnEnemy();
+    }
+  }
 
 	
 	glutPostRedisplay();
@@ -267,6 +287,8 @@ void Game::loadTextures()
 	loadTexture("tiles01.bmp", Textures::TILES01);
 	loadTexture("professor.bmp", Textures::PROFESSOR);
   loadTexture("megaman.bmp", Textures::MEGAMAN);
+  loadTexture("plank01.bmp", Textures::PLANK);
+  loadTexture("clover01.bmp", Textures::CLOVER);
 }
 void Game::loadTexture(const char * filename, Textures tex)
 {
