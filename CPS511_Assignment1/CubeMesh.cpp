@@ -20,9 +20,9 @@ CubeMesh::CubeMesh(Textures texture) : texture(texture)
 }
 
 
-// Given a cube mesh, compute it's current bounding box and return in vectors min and max
+// Given a mesh mesh, compute it's current bounding box and return in vectors min and max
 // i.e. compute min.x,min.y,mi.z,max.x,max.y,max.z
-// Use this function for collision detection of cube and walls/floor
+// Use this function for collision detection of mesh and walls/floor
 BBox CubeMesh::getBBox() const
 {
   //could be optimized by memoization
@@ -49,7 +49,7 @@ BBox CubeMesh::getBBox() const
 
 void CubeMesh::drawSelf() const
 {
-  // Transform and Draw cube   
+  // Transform and Draw mesh   
 
   glPushAttrib(GL_LIGHTING_BIT);
   Material* matptr = selected ? &highlightMaterial : &material;

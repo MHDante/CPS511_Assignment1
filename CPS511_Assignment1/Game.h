@@ -38,7 +38,8 @@ public:
 	int centerX;
 	int centerY;
 	int previousTime = 0, spawnTimer = 0, spawnTimerMax = 2000, spawnTimerMaxRand = 0;
-  VarMesh* cube;
+  int kills = 0;
+  VarMesh* mesh;
 	Game();
 	void setUpScene() override;
 	void display() override;

@@ -77,7 +77,6 @@ Vector3 QuadMesh::intersectsRay(Ray r) const {
   float d = top / bot;
   Vector3 intersectionPt = (r.origin + d * r.dir);
 
-
   Vector3 localPt = intersectionPt - origin;
 
   float projW = width.DotProduct(localPt) / width.GetLength();

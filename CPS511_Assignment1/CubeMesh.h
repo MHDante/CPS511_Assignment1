@@ -11,7 +11,7 @@
 #include "Transform.h"
 
 
-// Vertex positions of a standard size cube (width 2), centered at the origin
+// Vertex positions of a standard size mesh (width 2), centered at the origin
 // of its own Model Coordinate System
 
 class Room;

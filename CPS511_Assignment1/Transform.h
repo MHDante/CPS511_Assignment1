@@ -13,16 +13,17 @@ private:
   Vector3 rotation = Vector3(0, 0, 0);
 
 protected:
-  Matrix4 currentMatrix;
+  
 
   virtual void updateMatrix();
-  virtual void drawSelf() const;
+  
   virtual void drawChildren() const;
 public:
-
+  Matrix4 currentMatrix;
   Transform* getParent() const{ return parent;}
   virtual void draw() const;
-  void translate(Vector3 diff);
+  virtual void drawSelf() const;
+  virtual void translate(Vector3 diff);
   void Scale(Vector3 diff);
   void rotateEulers(Vector3 rot);
   bool setParent(Transform* p);
