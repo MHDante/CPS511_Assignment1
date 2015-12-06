@@ -19,6 +19,7 @@
 #include "RGBpixmap.h"
 
 #include "Room.h"
+#include "VarMesh.h"
 #include "Robot.h"
 
 class Game : public GLApp
@@ -37,6 +38,7 @@ public:
 	int centerX;
 	int centerY;
 	int previousTime = 0, spawnTimer = 0, spawnTimerMax = 2000, spawnTimerMaxRand = 0;
+  VarMesh* cube;
 	Game();
 	void setUpScene() override;
 	void display() override;
@@ -54,7 +56,7 @@ public:
 	void recenterMouse();
 	Room* roomAt(Vector3 center);
 
-	std::vector<Room*> rooms;
+  std::vector<Room*> rooms;
 	std::vector<Line> lines;
 };
 

@@ -7,11 +7,10 @@
 #include <string>
 #include <sstream>
 #include <iomanip>
-# define M_PIl          3.141592653589793238462643383279502884L /* pi */
+# define M_PIl 3.14159265358979323846f
+#define DEG2RAD (M_PIl / 180)
 
-#define DEG2RAD (3.14159265358979323846 / 180)
-
-enum class Textures { TILES01, PROFESSOR, BOT };
+enum class Textures { TILES01, PROFESSOR, MEGAMAN, BOT };
 
 inline std::string floatToSmallString(float f, int precision = 2) {
   std::stringstream ss;
@@ -23,6 +22,14 @@ struct Vector4 {
   float x; float y; float z;  float w;
   Vector4() :x(0), y(0), z(0), w(0) {};
   Vector4(float x, float y, float z, float w) :x(x), y(y), z(z), w(w) {};
+
+  operator float* () const { return (float*) this; }
+  operator const float* () const { return (const float*) this; }
+};
+struct Vector2 {
+  float x; float y;
+  Vector2() :x(0), y(0){};
+  Vector2(float x, float y) :x(x), y(y){};
 
   operator float* () const { return (float*) this; }
   operator const float* () const { return (const float*) this; }
@@ -141,8 +148,8 @@ public:
 	void RotateX(double angle);
 	Vector3 GetRotatedX(double angle) const;
 	void RotateY(double angle) {
-    float cn = cos(angle*DEG2RAD);
-    float sn = sin(angle*DEG2RAD);
+    float cn = float(cos(angle*DEG2RAD));
+    float sn = float(sin(angle*DEG2RAD)) ;
     auto tempx = x * cn - z * sn;
     auto tempz = z * cn + x * sn;
     x = tempx;
@@ -321,10 +328,10 @@ public:
 
 };
 
-inline double randZeroToOne()
+inline float randZeroToOne()
 {
 
-  return rand() / (RAND_MAX + 1.);
+  return rand() / (RAND_MAX + 1.f);
 }
 
 #endif	//VECTOR3D_H

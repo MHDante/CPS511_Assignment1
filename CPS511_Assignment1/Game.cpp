@@ -3,6 +3,7 @@
 #include "GLUtils.h"
 #include <iostream>
 #include <thread>
+#include "VarMesh.h"
 
 Game* Game::instance = nullptr;
 //=******************************************************************
@@ -38,6 +39,8 @@ void Game::setUpScene() {
 	player = new Player(this);
 	
 	player->center = Vector3(0.0, 2.0, 0.0);
+  cube = new VarMesh();
+  cube->loadOBJ("megaman.obj");
 
 	recenterMouse();
 	player->turnPlayer(0);
@@ -58,17 +61,12 @@ void Game::display(void)
     for (auto& c : cubes) c->draw();
     for (auto& r : rooms) r->Draw();
     for (auto& l : lines) l.Draw();
+    for (auto& b : bullets)b->draw();
+    for (auto& b : robots)b->draw();
 
-	//player->draw();
+	player->draw();
+  cube->Draw();
 
-	for (auto& b : bullets)
-	{
-		b->draw();
-	}
-	for (auto& r : robots)
-	{
-		r->draw();
-	}
 	glutSwapBuffers();
 }
 
@@ -222,7 +220,7 @@ void Game::spawnEnemy()
 	robot->center.y = r->min.y + r->max.y / 2;
 	robot->setRandDirection();
 	robots.push_back(robot);
-	
+
 }
 void Game::recenterMouse()
 {
@@ -233,6 +231,7 @@ void Game::loadTextures()
 {
 	loadTexture("tiles01.bmp", Textures::TILES01);
 	loadTexture("professor.bmp", Textures::PROFESSOR);
+  loadTexture("megaman.bmp", Textures::MEGAMAN);
 	loadTexture("robot.bmp", Textures::BOT);
 }
 void Game::loadTexture(const char * filename, Textures tex)

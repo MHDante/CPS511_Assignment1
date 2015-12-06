@@ -63,16 +63,16 @@ Room* Room::SpawnRoom(Direction dir) {
       start = center() + (Vector3(dir == LEFT ? -width() : width(), 0, -depth()) / 2);
       end = center() + (Vector3(dir == LEFT ? -width() : width(),0,depth()) / 2);
       leeway = Vector3(0, 0, 1) * (depth() - doorWidth);
-      wall1->dim = leeway * ratio + Vector3(.3, height(), 0);
-      wall2->dim = leeway * (1-ratio) + Vector3(.3, height(), 0);
+      wall1->dim = leeway * ratio + Vector3(.3f, height(), 0);
+      wall2->dim = leeway * (1-ratio) + Vector3(.3f, height(), 0);
 
     } else {
       start = center() + (Vector3(-width(), 0, dir == BACK ? depth() : -depth()) / 2);
       end = center() + (Vector3(width(), 0, dir == BACK ? depth() : -depth()) / 2);
       leeway = Vector3(1, 0,0) * (width() - doorWidth);
 
-      wall1->dim = leeway * ratio + Vector3(0, height(), .3);
-      wall2->dim = leeway * (1 - ratio) + Vector3(0, height(), .3);
+      wall1->dim = leeway * ratio + Vector3(0, height(), .3f);
+      wall2->dim = leeway * (1 - ratio) + Vector3(0, height(), .3f);
     }
     wall1->center = start + leeway*(ratio/2);
     wall2->center = end - leeway*((1 - ratio)/2);

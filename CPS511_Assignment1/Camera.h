@@ -17,10 +17,10 @@ public:
   Vector3 pos;
   Vector3 target;
   Vector3 up;
-  double fovY;
-  double aspect;
-  double nearZ;
-  double farZ;
+  float fovY;
+  float aspect;
+  float nearZ;
+  float farZ;
   GLApp* glApp;
   CubeMesh* parent;
   Camera::Camera(GLApp* gl_app);

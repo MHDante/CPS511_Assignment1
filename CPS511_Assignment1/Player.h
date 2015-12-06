@@ -3,7 +3,6 @@
 #define PLAYER
 
 #include "CubeMesh.h"
-#include "Camera.h"
 #include "Bullet.h"
 
 class Game;
@@ -16,7 +15,7 @@ public:
   explicit Player(Game * game);
 	void turnPlayer(int xMouseDiff);
 	void update(int deltaTime) override;
-	void movePlayer(int x, int y, int deltaTime);
+	void movePlayer(float x, float y, int deltaTime);
 	void spawnBullet();
   void draw() const override;
 private:

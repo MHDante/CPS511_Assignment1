@@ -11,7 +11,7 @@ Player::Player(Game*g):CubeMesh((Textures)0)
   /*
   auto dante = false;
   if (dante) {
-  moveSpeed /= 4;
+    moveSpeed /= 4;
   }
   */
 
@@ -25,7 +25,7 @@ void Player::turnPlayer(int xMouseDiff)
 	//xMousePrev = xMouse;
 }
 
-void Player::movePlayer(int x, int y, int deltaTime)
+void Player::movePlayer(float x, float y, int deltaTime)
 {
 	if (x == 0 && y == 0) return;
 	Vector3 forwardDir = Vector3(0,0,-1).GetRotatedY(-rotation.y);
