@@ -2,8 +2,13 @@
 #include "CubeMesh.h"
 #include "Game.h"
 
-Room::Room(Vector3 min, Vector3 max) :BBox(min,max) {
+Room::Room(Vector3 pos, Vector3 Scale) {
 
+  position = pos;
+  scale = Scale;
+  min = pos - Scale / 2;
+  max = pos + Scale / 2;
+  
   Vector3 up = Vector3(0, max.y - min.y, 0);
   Vector3 right = Vector3(max.x-min.x, 0, 0);
   Vector3 forward = Vector3(0, 0, max.z - min.z);
@@ -38,10 +43,7 @@ bool Room::Contains(BBox* box) const {
 float Room::width() const { return max.x - min.x; }
 float Room::depth() const { return max.z - min.z; }
 float Room::height() const { return max.y - min.y; }
-Vector3 Room::center() const {
-  
-  return (max+min)/2;
-}
+
 
 Room* Room::SpawnRoom(Direction dir) {
   if (rooms[dir] != nullptr) return rooms[dir];
@@ -56,29 +58,29 @@ Room* Room::SpawnRoom(Direction dir) {
 
     CubeMesh* wall1 = new CubeMesh(Textures::TILES01);
     CubeMesh* wall2 = new CubeMesh(Textures::TILES01);
-    auto doorWidth = 2;
+    auto doorWidth = 4;
     float ratio = randZeroToOne();
     Vector3 leeway, start, end;
     if (dir == LEFT || dir == RIGHT) {
       start = center() + (Vector3(dir == LEFT ? -width() : width(), 0, -depth()) / 2);
       end = center() + (Vector3(dir == LEFT ? -width() : width(),0,depth()) / 2);
       leeway = Vector3(0, 0, 1) * (depth() - doorWidth);
-      wall1->dim = leeway * ratio + Vector3(.3f, height(), 0);
-      wall2->dim = leeway * (1-ratio) + Vector3(.3f, height(), 0);
+      wall1->scale = leeway * ratio + Vector3(.3f, height(), 0);
+      wall2->scale = leeway * (1-ratio) + Vector3(.3f, height(), 0);
 
     } else {
       start = center() + (Vector3(-width(), 0, dir == BACK ? depth() : -depth()) / 2);
       end = center() + (Vector3(width(), 0, dir == BACK ? depth() : -depth()) / 2);
       leeway = Vector3(1, 0,0) * (width() - doorWidth);
 
-      wall1->dim = leeway * ratio + Vector3(0, height(), .3f);
-      wall2->dim = leeway * (1 - ratio) + Vector3(0, height(), .3f);
+      wall1->scale = leeway * ratio + Vector3(0, height(), .3f);
+      wall2->scale = leeway * (1 - ratio) + Vector3(0, height(), .3f);
     }
-    wall1->center = start + leeway*(ratio/2);
-    wall2->center = end - leeway*((1 - ratio)/2);
+    wall1->position = start + leeway*(ratio/2);
+    wall2->position = end - leeway*((1 - ratio)/2);
     Game::instance->cubes.push_back(wall1);
     Game::instance->cubes.push_back(wall2);
-    rooms[dir] = new Room(min - diff, max - diff);
+    rooms[dir] = new Room(position - diff, scale);
     Direction opp = Direction((dir + 2) % 4);
     rooms[dir]->rooms[opp] = this;
     return rooms[dir];

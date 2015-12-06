@@ -8,7 +8,7 @@
 #include <vector>
 #include "GLUtils.h"
 #include "QuadMesh.h"
-
+#include "Transform.h"
 
 
 // Vertex positions of a standard size cube (width 2), centered at the origin
@@ -16,7 +16,7 @@
 
 class Room;
 
-class CubeMesh
+class CubeMesh : public Transform
 {
 private:
 	QuadMesh *faces[6];
@@ -29,9 +29,6 @@ public:
     }
 	}
 
-	Vector3 center;
-	Vector3 dim;
-	Vector3 rotation;				// Angle around y-axis of cube coordinate system
 	bool selected;
   bool hovered;
   static Material material; // Material properties for drawing
@@ -46,7 +43,7 @@ public:
   bool translate(Vector3 diff);
   virtual bool checkCollision(bool pointBased = false);
   bool rotateEulers(Vector3 rot);
-  bool scale(Vector3 diff);
+  bool Scale(Vector3 diff);
   bool rotate(Vector3 diff);
   bool extrude(Vector3 diff);
   bool raise(Vector3 diff);

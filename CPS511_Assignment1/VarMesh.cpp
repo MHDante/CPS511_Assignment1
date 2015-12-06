@@ -2,14 +2,6 @@
 #include "Game.h"
 #pragma warning(disable: 4996)
 
-VarMesh::VarMesh() {
-
-  material = Material(
-    Vector4(0, 0, 0, 1),
-    Vector4(0, 0, 0, 1),
-    Vector4(.9f, .5f, .0f, 1),
-    0.0);
-}
 void VarMesh::Draw(Material* mat) const {
   (mat == nullptr ? material : *mat).glApply();
 
@@ -28,8 +20,12 @@ void VarMesh::Draw(Material* mat) const {
   glDisableClientState(GL_NORMAL_ARRAY);
   glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 }
-bool VarMesh::loadOBJ(const char* path) {
-
+VarMesh::VarMesh(const char* path) {
+  material = Material(
+    Vector4(0, 0, 0, 1),
+    Vector4(0, 0, 0, 1),
+    Vector4(.9f, .5f, .0f, 1),
+    0.0);
   std::vector< unsigned int > vertexIndices, uvIndices, normalIndices;
 
   std::vector<Vector3> temp_vertices;
@@ -39,7 +35,7 @@ bool VarMesh::loadOBJ(const char* path) {
   FILE * file = fopen(path, "r");
   if (file == nullptr) {
       printf("Impossible to open the file !\n");
-      return false;
+      throw ERROR;
   }
   int line = 0;
   while (1) {
@@ -70,7 +66,8 @@ bool VarMesh::loadOBJ(const char* path) {
      int matches = fscanf(file, "%d/%d/%d %d/%d/%d %d/%d/%d\n", &vertexIndex[0], &uvIndex[0], &normalIndex[0], &vertexIndex[1], &uvIndex[1], &normalIndex[1], &vertexIndex[2], &uvIndex[2], &normalIndex[2]);
      if (matches != 9) {
        printf("File can't be read by our simple parser : ( Try exporting with other options\n");
-       return false;
+       throw ERROR;
+
      }
 
        vertexIndices.push_back(vertexIndex[0]);
@@ -101,5 +98,4 @@ bool VarMesh::loadOBJ(const char* path) {
     Vector3 normal = temp_normals[normalIndex - 1];
     normals.push_back(normal);
   }
-  return true;
 }

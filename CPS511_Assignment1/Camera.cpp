@@ -22,7 +22,7 @@ void Camera::display()
   {
     if (parent != nullptr) {
 
-      pos = parent->center;
+      pos = parent->position;
       float ang = parent->rotation.y * DEG2RAD - M_PIl / 2;
       auto forwardDir = Vector3(-cos(ang), 0, sin(ang));
       target = pos + forwardDir;

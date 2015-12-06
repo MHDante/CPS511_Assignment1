@@ -326,6 +326,10 @@ public:
   BBox() { this->min = Vector3(); this->max = Vector3(); };
   virtual ~BBox() {}
 
+  Vector3 BBox::center() const {
+
+    return (max + min) / 2;
+  }
 };
 
 inline float randZeroToOne()

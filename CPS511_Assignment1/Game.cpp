@@ -22,7 +22,7 @@ Game::Game()
 }
 
 void Game::setUpScene() {
-  rooms.push_back(new Room(Vector3(-4.0f, 0, -4.0), Vector3(8.0f, 3.0, 8.0)));
+  rooms.push_back(new Room(Vector3(0,0,0), Vector3(16,8,16)));
   rooms.push_back(rooms[0]->SpawnRoom(Room::LEFT));
   rooms.push_back(rooms[1]->SpawnRoom(Room::FORWARD));
   rooms.push_back(rooms[1]->SpawnRoom(Room::BACK));
@@ -34,13 +34,12 @@ void Game::setUpScene() {
 	mainCamera->fovY = 60.0;
 	mainCamera->aspect = 1.0;
 	mainCamera->nearZ = 1.0f;
-	mainCamera->farZ = 40.0;
+	mainCamera->farZ = 100;
 
 	player = new Player(this);
 	
-	player->center = Vector3(0.0, 2.0, 0.0);
-  cube = new VarMesh();
-  cube->loadOBJ("megaman.obj");
+	player->position = Vector3(0.0, 0, 0.0);
+  cube = new VarMesh("megaman.obj");
 
 	recenterMouse();
 	player->turnPlayer(0);
@@ -58,11 +57,11 @@ void Game::display(void)
 	// Set up the camera
 	mainCamera->display();
 	// Draw all cubes (see CubeMesh.h)
-    for (auto& c : cubes) c->draw();
-    for (auto& r : rooms) r->Draw();
-    for (auto& l : lines) l.Draw();
-    for (auto& b : bullets)b->draw();
-    for (auto& b : robots)b->draw();
+  for (auto& c : cubes) c->draw();
+  for (auto& r : rooms) r->Draw();
+  for (auto& l : lines) l.Draw();
+  for (auto& b : bullets)b->draw();
+  for (auto& b : robots)b->draw();
 
 	player->draw();
   cube->Draw();
@@ -216,8 +215,8 @@ void Game::spawnEnemy()
 	int roomIndex = rand() % rooms.size();
 	Room * r = rooms[roomIndex];
 	Robot * robot = new Robot(this);
-	robot->center = (r->max - r->min) * (randZeroToOne() * 0.6 + 0.2) + r->min;
-	robot->center.y = r->min.y + r->max.y / 2;
+	robot->position = (r->max - r->min) * (randZeroToOne() * 0.6 + 0.2) + r->min;
+	robot->position.y = (r->min.y + r->max.y) / 2;
 	robot->setRandDirection();
 	robots.push_back(robot);
 

@@ -11,9 +11,7 @@ CubeMesh::CubeMesh(Textures texture) : texture(texture)
 {
   selected = false;
   hovered = false;
-  rotation.Set(0, 0, 0);
-  center.Set(0, 0, 0);
-  dim.Set(2.0f, 2.0f, 2.0f);
+  scale *= 2;
 
 	faces[0] =new QuadMesh(1, Vector3(-1, 1, -1), Vector3(0, 0, 2), Vector3(2, 0, 0), texture);
 	faces[1] =new QuadMesh(1, Vector3(1, -1, 1), Vector3(-2, 0, 0), Vector3(0, 0, -2), texture);
@@ -32,10 +30,10 @@ BBox CubeMesh::getBBox() const
   //could be optimized by memoization
 
   Vector3 edgePoints[4] = {
-    (Vector3(-dim.x, 0,-dim.z)*.5).GetRotatedY(rotation.y),
-    (Vector3(-dim.x, 0,dim.z )*.5).GetRotatedY(rotation.y),
-    (Vector3(dim.x, 0,-dim.z )*.5).GetRotatedY(rotation.y),
-    (Vector3(dim.x, 0,dim.z  )*.5).GetRotatedY(rotation.y) };
+    (Vector3(-scale.x, 0,-scale.z)*.5).GetRotatedY(rotation.y),
+    (Vector3(-scale.x, 0,scale.z )*.5).GetRotatedY(rotation.y),
+    (Vector3(scale.x, 0,-scale.z )*.5).GetRotatedY(rotation.y),
+    (Vector3(scale.x, 0,scale.z  )*.5).GetRotatedY(rotation.y) };
 
   float maxX = FLT_MIN;
   float maxZ = FLT_MIN;
@@ -44,10 +42,10 @@ BBox CubeMesh::getBBox() const
     if (pt.x > maxX) maxX = pt.x;
     if (pt.z > maxZ) maxZ = pt.z;
   }
-  auto bounds = Vector3(maxX, dim.y/2, maxZ);
+  auto bounds = Vector3(maxX, scale.y/2, maxZ);
   auto b = BBox();
-  b.min = (center - (bounds) );
-  b.max = (center + (bounds) );
+  b.min = (position - (bounds) );
+  b.max = (position + (bounds) );
   return b;
 }
 
@@ -57,7 +55,7 @@ void CubeMesh::drawSelector() const {
   if (singleSelecting) highlightMaterial.glApply();
   else material.glApply();
 
-  glTranslatef(0, dim.y / 2 + 0.2f, 0);
+  glTranslatef(0, scale.y / 2 + 0.2f, 0);
   glRotatef(270, 1, 0, 0);
   GLUquadricObj *quadObj = gluNewQuadric();
   gluCylinder(quadObj, 0, .5, 1, 10, 10);
@@ -71,10 +69,10 @@ void CubeMesh::draw() const
   // Transform and Draw cube   
   glPushMatrix();
   glPushAttrib(GL_LIGHTING_BIT);
-  glTranslatef(center.x, center.y, center.z);
+  glTranslatef(position.x, position.y, position.z);
   if (hovered) drawSelector();
   glRotatef(rotation.y, 0, 1, 0);
-  glScalef(dim.x/2, dim.y/2, dim.z/2);
+  glScalef(scale.x/2, scale.y/2, scale.z/2);
   Material* matptr = selected ? &highlightMaterial : &material;
 
   for(auto& face : faces) {
@@ -86,34 +84,34 @@ void CubeMesh::draw() const
 
 bool CubeMesh::translate(Vector3 diff)
 {
-  center += diff*.4f;
+  position += diff*.4f;
   return checkCollision(true);
 }
 bool CubeMesh::checkCollision(bool pointbased) {
 
   BBox b = getBBox();
-  auto room = Game::instance->roomAt(center);
-  bool roomCollisions =  room != nullptr && (room->Contains(&b) || (pointbased && room->Contains(center)));
+  auto room = Game::instance->roomAt(position);
+  bool roomCollisions =  room != nullptr && (room->Contains(&b) || (pointbased && room->Contains(position)));
   if (!roomCollisions) 
     return false;
   for(auto& blocks : Game::instance->cubes) {
     BBox other = blocks->getBBox();
-    if (other.Intersects(getBBox()) && !(pointbased && !other.Contains(center))) {
+    if (other.Intersects(getBBox()) && !(pointbased && !other.Contains(position))) {
       return false;
     }
   }
   
   return true;
 }
-bool CubeMesh::scale(Vector3 diff)
+bool CubeMesh::Scale(Vector3 diff)
 {
 
   diff.x = diff.x == 1 ? 1.25f : diff.x == -1 ? 0.8f : 1;
   diff.z = diff.z == -1 ? 1.25f : diff.z == 1 ? 0.8f : 1;
   if ((rotation.y > 45 && rotation.y < 135) || (rotation.y > 225 && rotation.y < 315)) diff = Vector3(diff.z, 0, diff.x);
-  dim.SetX(dim.x * diff.x);
-  dim.SetZ(dim.z * diff.z);
-  return checkCollision() && dim.x > 0.1 && dim.z > 0.1;
+  scale.SetX(scale.x * diff.x);
+  scale.SetZ(scale.z * diff.z);
+  return checkCollision() && scale.x > 0.1 && scale.z > 0.1;
 }
 bool CubeMesh::rotate(Vector3 diff)
 {
@@ -129,13 +127,13 @@ bool CubeMesh::rotateEulers(Vector3 rot)
 }
 bool CubeMesh::extrude(Vector3 diff)
 {
-  dim.SetY(dim.y + diff.x - diff.z);
-  center.SetY(center.y + (diff.x - diff.z)*.5f);
-  return checkCollision() && dim.y > 0.1;;
+  scale.SetY(scale.y + diff.x - diff.z);
+  position.SetY(position.y + (diff.x - diff.z)*.5f);
+  return checkCollision() && scale.y > 0.1;;
 }
 bool CubeMesh::raise(Vector3 diff)
 {
-  center.SetY(center.y + (diff.x - diff.z)*.5f);
+  position.SetY(position.y + (diff.x - diff.z)*.5f);
   return checkCollision();
 }
 
@@ -143,32 +141,32 @@ Vector3 CubeMesh::Intersects(Ray ray) const {
   
 
   if (rotation.y != 0) {
-    auto relorigin = ray.origin - center;
-    auto reltarget = (ray.origin + ray.dir) - center;
+    auto relorigin = ray.origin - position;
+    auto reltarget = (ray.origin + ray.dir) - position;
     relorigin.RotateY(rotation.y);
     reltarget.RotateY(rotation.y);
-    ray.origin = center + relorigin;
-    ray.dir = (center + reltarget - ray.origin);
+    ray.origin = position + relorigin;
+    ray.dir = (position + reltarget - ray.origin);
   }
-  ray.origin -= center;
+  ray.origin -= position;
 
-  ray.origin.z /= dim.z / 2;
-  ray.origin.y /= dim.y / 2;
-  ray.origin.x /= dim.x / 2;
-  ray.dir.z /= dim.z/2;
-  ray.dir.y /= dim.y / 2;
-  ray.dir.x /= dim.x/2;
+  ray.origin.z /= scale.z / 2;
+  ray.origin.y /= scale.y / 2;
+  ray.origin.x /= scale.x / 2;
+  ray.dir.z /= scale.z/2;
+  ray.dir.y /= scale.y / 2;
+  ray.dir.x /= scale.x/2;
 
   Vector3 ret = Vector3::Sentinel();
   for (auto& face : faces) {
     auto hit = face->intersectsRay(ray);
     if (hit.isValid()) {
-      hit.z *= dim.z/2;
-      hit.x *= dim.x / 2;
-      hit.y *= dim.y/2;
+      hit.z *= scale.z/2;
+      hit.x *= scale.x / 2;
+      hit.y *= scale.y/2;
       hit.RotateY(-rotation.y);
 
-      hit += center;
+      hit += position;
       if(!ret.isValid() || hit.z > ret.z) 
         ret = hit;
     }

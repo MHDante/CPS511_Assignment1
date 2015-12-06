@@ -32,7 +32,7 @@ void Player::movePlayer(float x, float y, int deltaTime)
   Vector3 rightDir = Vector3(1,0,0).GetRotatedY(-rotation.y);
   Vector3 dir = (y * forwardDir + x * rightDir) * moveSpeed * deltaTime;
   if (!translate(dir)) translate(-dir);
-	//printf("after : %f %f %f\n", center.x, center.y, center.z);
+	//printf("after : %f %f %f\n", position.x, position.y, position.z);
 }
 void Player::update(int deltaTime)
 {
@@ -42,7 +42,7 @@ void Player::update(int deltaTime)
 void Player::spawnBullet()
 {
 	Bullet * bullet = new Bullet();
-	bullet->center = center;
+	bullet->position = position;
 	Vector3 forwardDir = Vector3(0, 0, -1).GetRotatedY(-rotation.y);
 	bullet->setVelocity(forwardDir);
 	game->bullets.push_back(bullet);
