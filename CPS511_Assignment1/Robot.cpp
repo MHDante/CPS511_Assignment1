@@ -2,10 +2,17 @@
 #include "Game.h"
 #include <iostream>
 
-Robot::Robot(Game*g) :CubeMesh(Textures::BOT)
+Robot::Robot(Game*g) :CubeMesh(Textures::PROFESSOR)
 {
 	this->game = g;
 	moveSpeed = 0.01f;
+  health = 1;
+  botTransform = Transform();
+  //varMesh = new VarMesh("megaman.obj");
+  setScale(Vector3(1.5f, 1.5f, 1.5f));
+  botTransform.setScale(Vector3(0.3f, 0.3f, 0.3f));
+  //setPosition(Vector3(getPosition().x, -1.0f, getPosition().z));
+
 	/*
 	auto dante = false;
 	if (dante) {
@@ -13,6 +20,14 @@ Robot::Robot(Game*g) :CubeMesh(Textures::BOT)
 	}
 	*/
 
+}
+void Robot::translate(Vector3 diff)
+{
+  CubeMesh::translate(diff);
+  Vector3 p = getWorldPos();
+  p.y = -2.0f;
+  botTransform.setPosition(p);
+  //translate(Vector3(0, -1.0f, 0));
 }
 void Robot::setVelocity(Vector3 dir)
 {
@@ -22,6 +37,7 @@ void Robot::setRandDirection()
 {
 	int randAngle = rand() % 360;
 	setVelocity(Vector3(1, 0, 0).GetRotatedY(randAngle));
+  botTransform.setRotation(Vector3(0, -randAngle+90, 0));
 }
 void Robot::update(int deltaTime)
 {
@@ -32,26 +48,41 @@ void Robot::update(int deltaTime)
 		translate(-v);
 		setRandDirection();
 	}
+  
+  if (shotCooldown)
+  {
+    shotTimer += deltaTime;
+    if (shotTimer >= shotTimerMax)
+    {
+      shotTimer = 0;
+      shotCooldown = false;
+}
+  }
+  Room * playerRoom = Game::instance->roomAt(Game::instance->player->getWorldPos());
+  Room * room = Game::instance->roomAt(getWorldPos());
+  if (playerRoom == room && !shotCooldown)
+  {
+    spawnBullet();
+    shotCooldown = true;
+  }
 }
 bool Robot::checkCollision(bool pointBased)
 {
 	for (auto& bullet : Game::instance->bullets) {
 		BBox other = bullet->getBBox();
+    if (!bullet->shotByPlayer) continue;
 		if (other.Intersects(getBBox()) && !(pointBased && !other.Contains(getWorldPos()))) {
-			printf("HIT");
-			///AAARRGGGG
-
-			Game::instance->bullets.erase(std::remove(Game::instance->bullets.begin(), Game::instance->bullets.end(), bullet), Game::instance->bullets.end());
-			
-			delete(bullet); 
+      bullet->flaggedForRemoval = true;
 			if (--health <= 0)
 			{
-				Game::instance->robots.erase(std::remove(Game::instance->robots.begin(), Game::instance->robots.end(), this), Game::instance->robots.end());
-				delete(this);
+        if (!flaggedForRemoval)
+        {
+          Game::instance->kills++;
+        }
+        flaggedForRemoval = true;
 				return true;
 			}
 			break;
-			//return false;
 		}
 	}
 
@@ -61,20 +92,26 @@ bool Robot::checkCollision(bool pointBased)
 			return false;
 		}
 	}
-
 	return CubeMesh::checkCollision(pointBased);
-
-
 }
 void Robot::spawnBullet()
 {
 	Bullet * bullet = new Bullet();
+  bullet->shotByPlayer = false;
+  bullet->moveSpeed /= 3.0f;
 	bullet->setPosition(getWorldPos());
-	Vector3 forwardDir = Vector3(0, 0, -1).GetRotatedY(-getRotation().y);
+  Vector3 forwardDir = Game::instance->player->getWorldPos() - getWorldPos();
+  forwardDir.Normalize();
 	bullet->setVelocity(forwardDir);
 	game->bullets.push_back(bullet);
-	//printf("%d", game->bullets.size());
 }
-void Robot::draw() const {
-	CubeMesh::draw();
+//void Robot::drawSelf() const {
+//	//CubeMesh::draw();
+//  //varMesh->Draw();
+//  Game::instance->mesh->Draw();
+//}
+
+void Robot::drawSelf() const
+{
+  Game::instance->mesh->draw();
 }

@@ -16,15 +16,15 @@ protected:
   Matrix4 currentMatrix;
   Matrix4 inverseMatrix;
 
+
   virtual void updateMatrix();
   virtual void updateGeometry();
   virtual void drawSelf() const;
   virtual void drawChildren() const;
 public:
-
   Transform* getParent() const{ return parent;}
   virtual void draw() const;
-  void translate(Vector3 diff);
+  virtual void translate(Vector3 diff);
   void Scale(Vector3 diff);
   void rotateEulers(Vector3 rot);
   bool setParent(Transform* p);

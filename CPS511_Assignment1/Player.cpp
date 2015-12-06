@@ -8,6 +8,7 @@ Player::Player(Game*g):CubeMesh((Textures)0)
 	this->game = g;
   mouseSensitivity = .1f;
   moveSpeed = 0.02f;
+  health = maxHealth;
   /*
   auto dante = false;
   if (dante) {
@@ -41,12 +42,36 @@ void Player::update(int deltaTime)
 void Player::spawnBullet()
 {
 	Bullet * bullet = new Bullet();
+  bullet->shotByPlayer = true;
 	bullet->setPosition(getWorldPos());
 	Vector3 forwardDir = Vector3(0, 0, -1).GetRotatedY(-getRotation().y);
 	bullet->setVelocity(forwardDir);
 	game->bullets.push_back(bullet);
-	//printf("%d", game->bullets.size());
 }
 void Player::draw() const {
   
+}
+bool Player::checkCollision(bool pointBased)
+{
+  for (auto& bullet : Game::instance->bullets) {
+    BBox other = bullet->getBBox();
+    if (bullet->shotByPlayer) continue;
+    if (other.Intersects(getBBox()) && !(pointBased && !other.Contains(getWorldPos()))) {
+      bullet->flaggedForRemoval = true;
+      if (--health <= 0)
+      {
+        //game over
+        //return true;
+      }
+    }
+  }
+  /*
+  for (auto& robot : Game::instance->robots) {
+    BBox other = robot->getBBox();
+    if (other.Intersects(getBBox()) && !(pointBased && !other.Contains(getPosition()))) {
+      return false;
+    }
+  }
+  */
+  return CubeMesh::checkCollision(pointBased);
 }

@@ -23,7 +23,7 @@ CubeMesh::CubeMesh(Textures texture) : texture(texture)
 
 void CubeMesh::drawSelf() const
 {
-  // Transform and Draw cube   
+  // Transform and Draw mesh   
 
   glPushAttrib(GL_LIGHTING_BIT);
   Material* matptr = selected ? &highlightMaterial : &material;

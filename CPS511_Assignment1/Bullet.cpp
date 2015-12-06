@@ -16,6 +16,7 @@ void Bullet::update(int deltaTime)
 	if (lifeLeft-- <= 0)
 	{
 		//disappear bullet
+    flaggedForRemoval = true;
 	}
 	translate(velocity * float(deltaTime));
 }

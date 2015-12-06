@@ -7,10 +7,11 @@
 #include <string>
 #include <sstream>
 #include <iomanip>
+#include <gl/glut.h>
 # define M_PIl 3.14159265358979323846f
 #define DEG2RAD (M_PIl / 180)
 
-enum class Textures { TILES01, PROFESSOR, MEGAMAN, BOT };
+enum class Textures { TILES01, PROFESSOR, MEGAMAN };
 
 enum Direction { RIGHT, UP, FORWARD, LEFT, DOWN, BACK, };
 
@@ -355,6 +356,28 @@ inline float randZeroToOne()
 {
 
   return rand() / (RAND_MAX + 1.f);
+}
+// drawText function used from https://rbellek.wordpress.com/category/game-engine/opengl/
+inline void drawText(const char *text, int length, int x, int y) {
+  glMatrixMode(GL_PROJECTION); // change the current matrix to PROJECTION
+  double matrix[16]; // 16 doubles in stack memory
+  glGetDoublev(GL_PROJECTION_MATRIX, matrix); // get the values from PROJECTION matrix to local variable
+  glLoadIdentity(); // reset PROJECTION matrix to identity matrix
+  glOrtho(0, 800, 0, 600, -5, 5); // orthographic perspective
+  glMatrixMode(GL_MODELVIEW); // change current matrix to MODELVIEW matrix again
+  glLoadIdentity(); // reset it to identity matrix
+  glPushMatrix(); // push current state of MODELVIEW matrix to stack
+  glLoadIdentity(); // reset it again. (may not be required, but it my convention)
+  float sc = 3.0f;
+  glScalef(sc, sc, sc);
+  glRasterPos2i(x, y); // raster position in 2D
+  for (int i = 0; i<length; i++) {
+    glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, (int)text[i]); // generation of characters in our text with 9 by 15 GLU font
+  }
+  glPopMatrix(); // get MODELVIEW matrix value from stack
+  glMatrixMode(GL_PROJECTION); // change current matrix mode to PROJECTION
+  glLoadMatrixd(matrix); // reset
+  glMatrixMode(GL_MODELVIEW); // change current matrix mode to MODELVIEW
 }
 
 #endif	//VECTOR3D_H

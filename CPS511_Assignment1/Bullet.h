@@ -10,6 +10,7 @@ public:
 	float moveSpeed = 0.05f;
 	float radius = 0.2f;
 	int lifeLeft = 1000;
+  bool shotByPlayer = false;
 	Vector3 velocity;
 	Bullet();
 	void setVelocity(Vector3 dir);

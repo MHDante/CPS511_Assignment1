@@ -11,7 +11,7 @@
 #include "Transform.h"
 
 
-// Vertex positions of a standard size cube (width 2), centered at the origin
+// Vertex positions of a standard size mesh (width 2), centered at the origin
 // of its own Model Coordinate System
 
 class Room;
@@ -31,6 +31,7 @@ public:
 
 	bool selected;
   bool hovered;
+  bool flaggedForRemoval;
   static Material material; // Material properties for drawing
   static Material highlightMaterial;	// Material properties if selected
   Textures texture;

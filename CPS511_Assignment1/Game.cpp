@@ -20,7 +20,7 @@ Game::Game()
 }
 
 void Game::setUpScene() {
-  rooms.push_back(new Room(Vector3(0,0,0), Vector3(16,4,16)));
+  rooms.push_back(new Room(Vector3(0,0,0), Vector3(32,4,32)));
   rooms.push_back(rooms[0]->SpawnRoom(LEFT));
   rooms.push_back(rooms[1]->SpawnRoom(FORWARD));
   rooms.push_back(rooms[1]->SpawnRoom(BACK));
@@ -35,10 +35,10 @@ void Game::setUpScene() {
   mainCamera->farZ = 100;
   mainCamera->Follow(player);
 
-  cube = new VarMesh("megaman.obj");
+  mesh = new VarMesh("megaman.obj");
 
-  cube->setPosition(Vector3(0.0f, -2, 0.0f));
-  cube->setScale(Vector3(0.2f,0.2f,0.2f));
+  mesh->setPosition(Vector3(0.0f, -2, 0.0f));
+  mesh->setScale(Vector3(0.2f, 0.2f, 0.2f));
 	recenterMouse();
 	glutSetCursor(GLUT_CURSOR_NONE);
 
@@ -58,13 +58,17 @@ void Game::display(void)
   for (auto& r : rooms) r->draw();
   for (auto& l : lines) l.Draw();
   for (auto& b : bullets)b->draw();
-  for (auto& b : robots)b->draw();
+  for (auto& r : robots)r->draw();
 
 	player->draw();
-  cube->draw();
+
+  char buff[40];
+  snprintf(buff, sizeof(buff), "Kills: %d  Remaining: %d Health: %d", kills, robots.size(), player->health);
+  drawText(buff, 40, 10, 10);
 
 	glutSwapBuffers();
 }
+
 
 Vector3 pos = Vector3(0, 0, 0);
 
@@ -194,6 +198,23 @@ void Game::idleFunc()
 	{
 		r->update(deltaTime);
 	}
+  bullets.erase(
+    std::remove_if(bullets.begin(), bullets.end(),
+      [](Bullet* element) -> bool {
+      //return true if element should be removed.
+    bool remove = element->flaggedForRemoval;
+    if (remove) free(element);
+        return remove;
+      } ), bullets.end() );
+  robots.erase(
+    std::remove_if(robots.begin(), robots.end(),
+      [](Robot* element) -> bool {
+    //return true if element should be removed.
+    bool remove = element->flaggedForRemoval;
+    if (remove) free(element);
+    return remove;
+  }), robots.end());
+
 	spawnTimer += deltaTime;
 	if (spawnTimer >= spawnTimerMaxRand)
 	{
@@ -209,12 +230,28 @@ void Game::idleFunc()
 }
 void Game::spawnEnemy()
 {
+  Room * playerRoom = roomAt(player->getWorldPos());
+  int i = 0, pRoomIndex = -1;
+  for(auto& rr : rooms)
+  {
+    if (rr == playerRoom)
+    {
+      pRoomIndex = i;
+      break;
+    }
+    i++;
+  }
 	int roomIndex = rand() % rooms.size();
+  
+  while (playerRoom != nullptr && roomIndex == pRoomIndex)
+  {
+    roomIndex = rand() % rooms.size();
+  }
 	Room * r = rooms[roomIndex];
 	Robot * robot = new Robot(this);
   auto v = (r->bounds.max - r->bounds.min) * (randZeroToOne() * 0.6f + 0.2f) + r->bounds.min;
   v.y = (r->bounds.min.y + r->bounds.max.y) / 2;
-	robot->setPosition(v);
+	robot->translate(v);
 	robot->setRandDirection();
 	robots.push_back(robot);
 
@@ -230,7 +267,6 @@ void Game::loadTextures()
 	loadTexture("tiles01.bmp", Textures::TILES01);
 	loadTexture("professor.bmp", Textures::PROFESSOR);
   loadTexture("megaman.bmp", Textures::MEGAMAN);
-	loadTexture("robot.bmp", Textures::BOT);
 }
 void Game::loadTexture(const char * filename, Textures tex)
 {
