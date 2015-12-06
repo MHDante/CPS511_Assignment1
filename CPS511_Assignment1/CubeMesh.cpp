@@ -66,7 +66,7 @@ void CubeMesh::drawSelector() const {
   glPopMatrix();
 }
 
-void CubeMesh::drawCube() const
+void CubeMesh::draw() const
 {
   // Transform and Draw cube   
   glPushMatrix();
@@ -87,13 +87,13 @@ void CubeMesh::drawCube() const
 bool CubeMesh::translate(Vector3 diff)
 {
   center += diff*.4;
-  auto room = Room::roomAt(center);
+  auto room = Game::instance->roomAt(center);
   return checkCollision(true);
 }
-bool CubeMesh::checkCollision(bool pointbased) const {
-
+bool CubeMesh::checkCollision(bool pointbased) {
+	
   BBox b = getBBox();
-  auto room = Room::roomAt(center);
+  auto room = Game::instance->roomAt(center);
   bool roomCollisions =  room != nullptr && (room->Contains(&b) || (pointbased && room->Contains(center)));
   if (!roomCollisions) 
     return false;
@@ -103,6 +103,7 @@ bool CubeMesh::checkCollision(bool pointbased) const {
       return false;
     }
   }
+  
   return true;
 }
 bool CubeMesh::scale(Vector3 diff)
@@ -175,3 +176,4 @@ Vector3 CubeMesh::Intersects(Ray ray) const {
   }
   return ret;
 }
+void CubeMesh::update(int deltaTime) {}

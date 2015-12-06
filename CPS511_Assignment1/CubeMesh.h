@@ -39,9 +39,10 @@ public:
   CubeMesh(Textures texture);
   void drawSelector() const;
   BBox getBBox() const;
-  virtual void drawCube() const;
+  virtual void draw() const;
+  virtual void update(int deltaTime);
   bool translate(Vector3 diff);
-  bool checkCollision(bool pointBased = false) const;
+  virtual bool checkCollision(bool pointBased = false);
   bool rotateEulers(Vector3 rot);
   bool scale(Vector3 diff);
   bool rotate(Vector3 diff);

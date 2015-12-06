@@ -1,7 +1,6 @@
 #include "Room.h"
 #include "CubeMesh.h"
 #include "Game.h"
-std::unordered_set<Room*> Room::allRooms = std::unordered_set<Room*>();
 
 Room::Room(Vector3 min, Vector3 max) :BBox(min,max) {
 
@@ -23,14 +22,6 @@ Room::Room(Vector3 min, Vector3 max) :BBox(min,max) {
   wallMeshes[RIGHT]->material.diffuse = diffuse;
   wallMeshes[BACK] = new QuadMesh(meshSize, max, -up, -right, Textures::TILES01);
   wallMeshes[BACK]->material.diffuse = diffuse;
-  allRooms.insert(this);
-}
-
-Room* Room::roomAt(Vector3 center) {
-  for(auto& r : allRooms) {
-    if (r!= nullptr && r->Contains(center)) return r;
-  }
-  return nullptr;
 }
 
 bool Room::Contains(BBox* box) const {

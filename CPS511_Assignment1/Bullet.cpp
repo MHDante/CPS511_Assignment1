@@ -2,23 +2,27 @@
 #include "Bullet.h"
 # define M_PIl          3.141592653589793238462643383279502884L
 
-Bullet::Bullet():CubeMesh((Textures)0) {}
+Bullet::Bullet():CubeMesh((Textures)0)
+{
+	float r = radius * 2;
+	dim = Vector3(r, r, r);
+}
 
 void Bullet::setVelocity(Vector3 dir)
 {
 	velocity = dir * moveSpeed;
 }
 
-void Bullet::update()
+void Bullet::update(int deltaTime)
 {
 	if (lifeLeft-- <= 0)
 	{
 		//disappear bullet
 	}
-	translate(velocity);
+	translate(velocity * deltaTime);
 }
 
-void Bullet::display()
+void Bullet::draw() const
 {
 	glPushMatrix();
 	//glPushAttrib(GL_LIGHTING_BIT);
@@ -28,7 +32,7 @@ void Bullet::display()
 	Material* matptr = selected ? &highlightMaterial : &material;
 	matptr->glApply();
 	GLUquadricObj *sphereObj = gluNewQuadric();
-	gluSphere(sphereObj, 0.2f, 10, 10);
+	gluSphere(sphereObj, 1.0, 10, 10);
 	glPopMatrix();
 	//glPopAttrib();
 }

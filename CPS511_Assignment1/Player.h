@@ -15,10 +15,10 @@ public:
 	float mouseSensitivity, moveSpeed;
   explicit Player(Game * game);
 	void turnPlayer(int xMouseDiff);
-	void update();
-	void movePlayer(int x, int y);
+	void update(int deltaTime) override;
+	void movePlayer(int x, int y, int deltaTime);
 	void spawnBullet();
-  void drawCube() const override;
+  void draw() const override;
 private:
 	int xMousePrev = 0;
 };

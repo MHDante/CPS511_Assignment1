@@ -7,7 +7,7 @@ Camera::Camera(GLApp* gl_app) {
     glApp = gl_app;
     fovY = 60;
     aspect = glApp->ScreenWidth / glApp->ScreenHeight;
-    nearZ = 0.3;
+    nearZ = 0.0;
     farZ = 100;
     target = Vector3(0,0,0);
     pos = Vector3(0,0,10);

@@ -11,7 +11,7 @@
 
 #define DEG2RAD (3.14159265358979323846 / 180)
 
-enum class Textures { TILES01, PROFESSOR };
+enum class Textures { TILES01, PROFESSOR, BOT };
 
 inline std::string floatToSmallString(float f, int precision = 2) {
   std::stringstream ss;
