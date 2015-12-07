@@ -35,11 +35,11 @@ public:
 	std::map<Textures, RGBpixmap> pixmaps;
 	Player * player;
 	Vector3 rightLeft, upDown;
-	int centerX;
+	int centerX; 
 	int centerY;
 	int previousTime = 0, spawnTimer = 0, spawnTimerMax = 5000, spawnTimerMaxRand = 0;
   int kills = 0;
-  int initialEnemies = 5;
+  const int initialEnemies = 5;
   bool wonGame = false;
   bool lostGame = false;
   VarMesh* mesh;

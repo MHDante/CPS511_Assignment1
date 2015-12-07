@@ -11,7 +11,6 @@ class Robot : public CubeMesh
 {
 public:
 	Game * game;
-  Transform botTransform;
 	float moveSpeed;
 	Vector3 velocity;
 	int health;

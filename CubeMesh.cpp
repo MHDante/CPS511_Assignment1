@@ -7,7 +7,7 @@ Material CubeMesh::highlightMaterial = Material(Vector4(0, 0, 0, 1.0), Vector4(0
 
 bool CubeMesh::singleSelecting = true;
 
-CubeMesh::CubeMesh(Textures texture) : texture(texture)
+CubeMesh::CubeMesh(Textures texture) : flaggedForRemoval(false), texture(texture)
 {
   selected = false;
   hovered = false;
@@ -17,6 +17,8 @@ CubeMesh::CubeMesh(Textures texture) : texture(texture)
 	faces[3] =new QuadMesh(1, Vector3(.5, .5, .5), Vector3(0, -1, 0), Vector3(0, 0, -1), texture);
 	faces[4] =new QuadMesh(1, Vector3(.5, .5, .5), Vector3(-1, 0, 0), Vector3(0, -1, 0), texture);
 	faces[5] =new QuadMesh(1, Vector3(-.5, -.5, -.5), Vector3(0, 1, 0), Vector3(1, 0, 0), texture);
+
+  //flaggedForRemoval = false;
 }
 
 

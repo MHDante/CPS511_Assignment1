@@ -48,7 +48,7 @@ Room* Room::SpawnRoom(Direction dir) {
 
     CubeMesh* wall1 = new CubeMesh(Textures::TILES01);
     CubeMesh* wall2 = new CubeMesh(Textures::TILES01);
-    auto doorWidth = .25;
+    float doorWidth = .25;
     float ratio = randZeroToOne();
     auto pos = Vector3(dir);
     auto straight = (dir == FORWARD || dir == BACK) ? Vector3(FORWARD) : Vector3(RIGHT);
@@ -56,12 +56,12 @@ Room* Room::SpawnRoom(Direction dir) {
     auto unit = (dir == UP || dir == DOWN) ? Vector3(FORWARD) : Vector3(UP);
     auto edge = (dir == FORWARD || dir == BACK) ? Vector3(RIGHT) : Vector3(FORWARD);
 
-    auto leeway =  (1 - doorWidth);
+    float leeway =  (1 - doorWidth);
 
     addChild(wall1);
     addChild(wall2);
-    wall1->setPosition(pos/2 + edge * (-.5 + (leeway * ratio /2)));
-    wall2->setPosition(pos/2 + edge * (.5 - (leeway * (1 - ratio) /2)));
+    wall1->setPosition(pos/2 + edge * (-.5f + (leeway * ratio /2)));
+    wall2->setPosition(pos/2 + edge * (.5f - (leeway * (1 - ratio) /2)));
     wall1->setScale( unit + edge * (leeway * ratio) + straight * 0.05f);
     wall2->setScale(unit + edge * (leeway * (1 - ratio)) + straight * 0.05f);
 

@@ -7,26 +7,13 @@ Robot::Robot(Game*g) :CubeMesh(Textures::PROFESSOR)
 	this->game = g;
 	moveSpeed = 0.01f;
   health = 1;
-  botTransform = Transform();
-  //varMesh = new VarMesh("megaman.obj");
   setScale(Vector3(1.5f, 1.5f, 1.5f));
-  botTransform.setScale(Vector3(0.3f, 0.3f, 0.3f));
-  //setPosition(Vector3(getPosition().x, -1.0f, getPosition().z));
-
-	/*
-	auto dante = false;
-	if (dante) {
-		moveSpeed /= 4;
-	}
-	*/
-
 }
 void Robot::translate(Vector3 diff)
 {
   CubeMesh::translate(diff);
   Vector3 p = getWorldPos();
   p.y = -2.0f;
-  botTransform.setPosition(p);
   //translate(Vector3(0, -1.0f, 0));
 }
 void Robot::setVelocity(Vector3 dir)
@@ -37,7 +24,7 @@ void Robot::setRandDirection()
 {
 	int randAngle = rand() % 360;
 	setVelocity(Vector3(1, 0, 0).GetRotatedY(randAngle));
-  setRotation(Vector3(0, -randAngle+90, 0));
+  setRotation(Vector3(0, -randAngle+90.f, 0));
 }
 void Robot::update(int deltaTime)
 {

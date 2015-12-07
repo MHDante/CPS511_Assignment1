@@ -197,6 +197,10 @@ void Game::restart()
   }
   wonGame = false;
   lostGame = false;
+  player->setPosition(Vector3(0.0, 0, 0.0));
+  player->setRotation(Vector3(0.0, 0, 0.0));
+  kills = 0;
+  player->health = player->maxHealth;
 }
 void Game::keyboardRelease(unsigned char key, int x, int y)
 {
