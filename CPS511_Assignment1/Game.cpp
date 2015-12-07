@@ -37,7 +37,7 @@ void Game::setUpScene() {
 
   mesh = new VarMesh("megaman.obj");
 
-  mesh->setPosition(Vector3(0.0f, -2, 0.0f));
+  mesh->setPosition(Vector3(0.0f, -1.3f, 0.0f));
   mesh->setScale(Vector3(0.2f, 0.2f, 0.2f));
 	recenterMouse();
 	glutSetCursor(GLUT_CURSOR_NONE);
@@ -47,7 +47,7 @@ void Game::setUpScene() {
 
   for (int i = 0; i < initialEnemies; i++)
   {
-    spawnEnemy();
+     spawnEnemy();
   }
 }
 void Game::display(void)
@@ -70,15 +70,17 @@ void Game::display(void)
   snprintf(buff, sizeof(buff), "Kills: %d  Remaining: %d Health: %d", kills, robots.size(), player->health);
   drawText(buff, 40, 10, 10);
 
-  if (wonGame)
+  if (lostGame)
   {
-    for (auto& r : rooms)
-    {
-      Vector3 worldpos = r->getWorldPos();
-      drawText("YOU WIN!", 8, 150, 100);
-    }
+    string s = "YOU LOST! Press F1 to restart.";
+    drawText(s.data(), s.length(), 130, 100);
   }
-
+  else if (wonGame)
+  {
+    string s = "YOU WIN! Press F1 to restart.";
+      drawText(s.data(), s.length(), 130, 100);
+  }
+  
 	glutSwapBuffers();
 }
 
@@ -182,15 +184,32 @@ void Game::functionKeys(int key, int x, int y)
 	glutPostRedisplay();
 	*/
 }
+void Game::restart()
+{
+  for(auto& r : robots)
+  {
+    delete r;
+  }
+  robots.clear();
+  for (int i = 0; i < initialEnemies; i++)
+  {
+    spawnEnemy();
+  }
+  wonGame = false;
+  lostGame = false;
+}
 void Game::keyboardRelease(unsigned char key, int x, int y)
 {
 	switch (key) {
 	case GLUT_KEY_F1: {
+    restart();
+    break;
 	}
-	case 'w':  upDown.x = 0;  break;
-	case 's':  upDown.y = 0;   break;
-	case 'd':  rightLeft.x = 0;   break;
-	case 'a':  rightLeft.y = 0;  break;
+	case 'w': upDown.x = 0;  break;
+	case 's': upDown.y = 0;   break;
+	case 'd': rightLeft.x = 0;   break;
+	case 'a': rightLeft.y = 0;  break;
+  case ' ': if (wonGame || lostGame) restart(); break;
 	}
 
 	glutPostRedisplay();

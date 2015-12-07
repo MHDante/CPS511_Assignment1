@@ -26,6 +26,7 @@ void GLApp::init(int argc, char **argv)
   glutKeyboardFunc([](unsigned char k, int x, int y) {instance__->keyboard(k, x, y); });
   glutKeyboardUpFunc([](unsigned char k, int x, int y) {instance__->keyboardRelease(k, x, y); });
   glutSpecialFunc([](int k, int x, int y) {instance__->functionKeys(k, x, y); });
+  glutSpecialUpFunc([](int k, int x, int y) {instance__->keyboardRelease(k, x, y); });
   
 
   glutIdleFunc([]() { instance__->idleFunc(); });

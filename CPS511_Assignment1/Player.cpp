@@ -26,6 +26,7 @@ void Player::turnPlayer(int xMouseDiff)
 
 void Player::movePlayer(float x, float y, int deltaTime)
 {
+  if (Game::instance->lostGame) return;
 	if (x == 0 && y == 0) return;
 	Vector3 forwardDir = Vector3(0,0,-1).GetRotatedY(-getRotation().y);
   Vector3 rightDir = Vector3(1,0,0).GetRotatedY(-getRotation().y);
@@ -43,6 +44,7 @@ void Player::update(int deltaTime)
       bullet->flaggedForRemoval = true;
       if (--health <= 0)
       {
+        Game::instance->lostGame = true;
         //game over
         //return true;
       }
@@ -52,6 +54,7 @@ void Player::update(int deltaTime)
 
 void Player::spawnBullet()
 {
+  if (Game::instance->lostGame) return;
 	Bullet * bullet = new Bullet();
   bullet->shotByPlayer = true;
 	bullet->setPosition(getWorldPos());

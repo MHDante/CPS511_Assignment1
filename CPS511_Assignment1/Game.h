@@ -39,8 +39,9 @@ public:
 	int centerY;
 	int previousTime = 0, spawnTimer = 0, spawnTimerMax = 5000, spawnTimerMaxRand = 0;
   int kills = 0;
-  int initialEnemies = 1;
+  int initialEnemies = 5;
   bool wonGame = false;
+  bool lostGame = false;
   VarMesh* mesh;
 	Game();
 	void setUpScene() override;
@@ -49,7 +50,8 @@ public:
 	void mouseMotionHandler(int xMouse, int yMouse) override;
 	void keyboard(unsigned char key, int x, int y) override;
 	void functionKeys(int key, int x, int y) override;
-	void keyboardRelease(unsigned char key, int x, int y) override;
+  void restart();
+  void keyboardRelease(unsigned char key, int x, int y) override;
 	void UpdateConsole() override;
 	void idleFunc() override;
 	void spawnEnemy();
